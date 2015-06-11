@@ -18,4 +18,4 @@ There is a [great walkthrough](https://robots.thoughtbot.com/middleman-bourbon-w
 
 ## Summary
 
-Although there are many things to setup, but I am pleased with the result. It was rewarding experience for a novice rubyist like me to have created, styled and setup my own site. Check the [source of this page](http://github.com/ikhsan) if you are interested.
+Although there are many things to setup, but I am pleased with the result. It was rewarding experience for a novice rubyist like me to have created, styled and setup my own site. Check the [source of this page](https://github.com/ikhsan/ikhsan.github.io/tree/develop) if you are interested.
