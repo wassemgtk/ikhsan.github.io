@@ -10,8 +10,8 @@ Slather is a ruby gem that generates code coverage reports from your Xcode proje
 
 Once your project is hooked to coverage service like coveralls, you will have the ability to review your coverage thoroughly via coveralls' web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.
 
-![Coveralls Report Table](2015-06-07-extending-slather/coveralls_2.png)
-![Coveralls Line Coverage](2015-06-07-extending-slather/coveralls_1.png)
+![Coveralls Report Table](/extending-slather/coveralls_2.png)
+![Coveralls Line Coverage](/extending-slather/coveralls_1.png)
 
 ## Local Usage : HTML Reports
 
@@ -23,8 +23,8 @@ First step is to find how to add features. By just browsing the list of merged p
 
 I'm not of a designer so I followed what already worked. Slather already has a delightful logo, so I used its colour scheme. Then I replicate coveralls styling for the tables and the highlighted source code. Syntax highlighting is using [`highlight.js`](https://highlightjs.org/) and sorting-filtering is using [list.js](http://www.listjs.com/).
 
-![Coveralls Report Table](2015-06-07-extending-slather/slather_html_1.png)
-![Coveralls Line Coverage](2015-06-07-extending-slather/slather_html_2.png)
+![Coveralls Report Table](/extending-slather/slather_html_1.png)
+![Coveralls Line Coverage](/extending-slather/slather_html_2.png)
 
 To generate the html report, use the `-h` or `--html` flag. By default, it will print the path of the index page. But if you want to open it automatically in your browser, you could use '--show' flag.
 
@@ -39,4 +39,4 @@ In WWDC 15, Apple announced code coverage support baked into Xcode. Developers w
 
 ## Currently in Pending
 
-This feature is still pending as a pull request. Hopefully, it will get merged soon. 🎉
+This feature is still pending as [a pull request](https://github.com/venmo/slather/pull/76). Hopefully, it will get merged soon. 🎉
