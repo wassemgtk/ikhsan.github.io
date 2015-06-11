@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Codeage<%= ' - ' + current_article.title unless current_article.nil? %></title>
+    <%= feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed" %>
+
+    <%= stylesheet_link_tag "all" %>
+    <%= stylesheet_link_tag "syntax-highlights" %>
+  </head>
+  <body>
+
+    <div id="main" role="main">
+      <%= partial "partials/nav" %>
+      <article>
+        <h1><%= current_article.title %></h1>
+        <%= yield %>
+        <div class="metadata">
+          <div class="date"><%= current_article.date.strftime('%b.%e %Y') %></div>
+          <%= partial "partials/tags", :locals => { :tags => current_article.tags } %>
+        </div>
+      </article>
+
+      <%= partial "partials/blog-footer" %>
+    </div>
+
+  </body>
+</html>

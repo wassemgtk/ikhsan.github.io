@@ -1,0 +1,61 @@
+/*
+  Articles
+*/
+
+article {
+
+  padding: 2em 0;
+  border-bottom: $base-border;
+
+  h1 > a {
+    border: none;
+  }
+
+  a {
+    border-bottom: 1px solid $medium-gray;
+    padding: 0 2px;
+  }
+
+  .metadata {
+    @include outer-container;
+    margin-top: 1em;
+    font-family: $heading-font-family;
+
+    a {
+      color: $medium-gray;
+      border-bottom: 0;
+    }
+
+    .date {
+      @include span-columns(2);
+      text-transform: uppercase;
+    }
+
+    .tag-list { @include span-columns(10); }
+
+  }
+
+  ul {
+    list-style-type: disc;
+    margin: 0 0 1em 2em;
+  }
+
+  .footnotes {
+    border-top: 1px solid shade($base-border-color, 40%);
+    padding-top: 0.5em;
+
+    ol {
+      list-style-type: decimal;
+      margin: 0 0 1em 2em;
+    }
+
+  }
+
+
+}
+
+span.article-link {
+  color: $medium-gray;
+  text-transform: uppercase;
+  margin-left: 0.5em;
+}

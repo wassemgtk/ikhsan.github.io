@@ -1,0 +1,42 @@
+---
+pageable: true
+per_page: 5
+---
+
+<% if paginate && num_pages > 1 %>
+  <p>Page <%= page_number %> of <%= num_pages %></p>
+
+  <% if prev_page %>
+    <p><%= link_to 'Previous page', prev_page %></p>
+  <% end %>
+<% end %>
+
+<ul>
+  <% page_articles.each_with_index do |article, i| %>
+    <li>
+
+      <article>
+        <h1><%= link_to article.title, article %></h1>
+        <p>
+          <%= article.summary %>
+          <%= link_to 'Read more &rarr;', article %>
+        </p>
+
+        <div class="metadata">
+          <div class="date">
+            <%= link_to article.date.strftime('%b.%e %Y'), article %>
+          </div>
+
+          <%= partial "partials/tags", :locals => { :tags => article.tags } %>
+        </div>
+      </article>
+
+    </li>
+  <% end %>
+</ul>
+
+<% if paginate %>
+  <% if next_page %>
+    <p><%= link_to 'Next page', next_page %></p>
+  <% end %>
+<% end %>

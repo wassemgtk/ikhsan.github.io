@@ -1,0 +1,62 @@
+footer {
+  padding-top: 2.5em;
+
+  .footer-blog {
+    p {
+      a {
+        border-bottom: 1px solid $medium-gray;
+        padding: 0 2px;
+      }
+    }
+  }
+
+  .footer-bar {
+    @include outer-container;
+
+    .recent {
+      @include span-columns(7);
+    }
+
+    .tags {
+      @include span-columns(5);
+
+      li.tag {
+        display: inline;
+        margin-right: 0.5em;
+
+        a {
+          text-transform: uppercase;
+          color: $medium-gray;
+          &::before { content: "#"; }
+        }
+
+      }
+    }
+  }
+
+  .footer-links {
+    text-align: center;
+    font-size: 0.9em;
+
+    ul {
+      margin: 1em 0 0.5em;
+      display: inline-block;
+      li {
+        display: inline;
+        padding: 8px;
+
+        a {
+          color: $medium-gray;
+          padding: 0 4px;
+        }
+      }
+    }
+
+    .copyright {
+      margin-bottom: 1em;
+      text-align: center;
+      font-style: italic;
+      color: $medium-gray;
+    }
+  }
+}

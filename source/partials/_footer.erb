@@ -1,0 +1,20 @@
+<footer>
+  <div class="footer-bar">
+    <div class="recent">
+
+      <h5 class="heading">Recent Articles</h5>
+      <%= partial "partials/article-list", :locals => { :articles => blog.articles[0...5] } %>
+
+    </div>
+
+    <div class="tags">
+
+      <h5 class="heading">Tags</h5>
+      <%= partial "partials/tags", :locals => { :tags => blog.tags.keys } %>
+
+    </div>
+  </div>
+
+  <%= partial "partials/footer-links" %>
+
+</footer>
