@@ -10,7 +10,7 @@ Last month, I went to Facebook for attending Cocoapods' [Test Jam](http://blog.c
 
 Once your project is hooked to coverage service like coveralls, you will have the ability to review your coverage thoroughly via coveralls' web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.
 
-![Coveralls Report Table](/extending-slather/coveralls_2.png)
+![Coveralls Report Table](/extending-slather/coveralls_1.png)
 
 ## Local Usage : HTML Reports
 
