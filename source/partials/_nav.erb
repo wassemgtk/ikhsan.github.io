@@ -3,4 +3,11 @@
   <p class="blog-description">
     Pardon my ramblings about code and such
   </p>
+  <div class="blog-lang">
+    <% if I18n.locale == :en %>
+    <strong>EN</strong> / <a href="/id">ID</a>
+    <% elsif I18n.locale == :id %>
+    <a href="/">EN</a> / <strong>ID</strong>
+    <% end %>
+  </div>
 </nav>

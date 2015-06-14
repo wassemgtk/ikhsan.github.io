@@ -4,17 +4,19 @@ date: 2015-06-07 23:47 UTC
 tags: ruby, slather, objective-c
 ---
 
-Last month, I went to Facebook for attending Cocoapods' [Test Jam](http://blog.cocoapods.org/Test-Jammin/). The gist of the event is adding tests for established posts together as community. That's when I heard **slather** for the first time. READMORE
+Last month, I went to Facebook London for attending Cocoapods' [Test Jam](http://blog.cocoapods.org/Test-Jammin/). The gist of the event is adding tests for established posts together as community. That's when I heard **slather** for the first time. READMORE
 
 [Slather](https://github.com/venmo/slather) is a ruby gem that generates code coverage reports from your Xcode project and hook it into CI. Installation and usage is simple, you could find your way to their [extensive guide](https://github.com/venmo/slather#installation).
 
-Once your project is hooked to coverage service like coveralls, you will have the ability to review your coverage thoroughly via coveralls' web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.
+Once your project is hooked to coverage service like [coveralls](https://coveralls.io), you will have the ability to review your coverage thoroughly via coveralls' web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.
 
 ![Coveralls Report Table](/extending-slather/coveralls_1.png)
 
 ## Local Usage : HTML Reports
 
-Sometimes, you also want the same information available locally. So you don't need to push any code just to get the information provided by coveralls. The simple output does not give much details. You only get coverage percentage for each file, but not __which lines__ are being covered.
+Sometimes, you also want the same information available locally. So you don't need to push any code just to get the information provided by coveralls.
+
+With slather, you could have that information using the simple output mode using `-s`. But for me, this does not give much details needed. You only get coverage percentage for each file, but not __which lines__ are being covered. I don't want to push everytime just to check which line is being covered.
 
 Having this problem, I'm thinking why don't I just extend slather's feature? It would be cool to have the ability to generate reports as static HTML pages. Making as static HTML means that you don't need further setup, other application nor connectivity. Just browser and you are good to go.
 

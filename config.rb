@@ -1,14 +1,12 @@
-###
-# Blog settings
-###
-
-## Localisation
 activate :i18n, :langs => [:en, :id]
 
-## Syntax Highlighting
 activate :syntax
 set :markdown_engine, :redcarpet
 set :markdown, :fenced_code_blocks => true, :smartypants => true
+
+configure :development do
+  set :debug_assets, true
+end
 
 activate :deploy do |deploy|
   deploy.method = :git
@@ -16,9 +14,9 @@ activate :deploy do |deploy|
 end
 
 activate :blog do |blog|
-  # blog.permalink = "{year}/{month}/{day}/{title}.html"
-  # Matcher for blog source files
-  # blog.sources = "{year}-{month}-{day}-{title}.html"
+  blog.permalink = "{year}/{month}/{day}/{lang}/{title}.html"
+  blog.sources = "{year}-{month}-{day}-{title}.{lang}.html"
+
   # blog.taglink = "tags/{tag}.html"
   # blog.summary_separator = /(READMORE)/
   # blog.year_link = "{year}.html"

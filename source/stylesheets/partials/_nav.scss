@@ -1,6 +1,7 @@
 nav {
   text-align: center;
   @include padding(30px null null null);
+  margin-bottom: 2em;
 
   .blog-title {
     font-size: golden-ratio(40px,  1);;
@@ -14,6 +15,12 @@ nav {
 
   p.blog-description {
     margin-top: -0.3em;
+    margin-bottom: 0;
+    color: $medium-gray;
+  }
+
+  .blog-lang {
+    font-size: 13px;
     color: $medium-gray;
   }
 }
