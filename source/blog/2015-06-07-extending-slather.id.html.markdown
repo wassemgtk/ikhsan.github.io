@@ -10,7 +10,7 @@ Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam a
 
 Setelah project terpasang dengan servis _code coverage_ seperti [coveralls](https://coveralls.io), kita bisa meninjau hasil _coverage_ kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.
 
-![Coveralls Report Table](/2015-06-07-extending-slather/coveralls_1.png)
+![Coveralls Report Table](2015-06-07-extending-slather/coveralls_1.png)
 
 ## Penggunaan secara Lokal : Laporan HTML
 
@@ -24,8 +24,8 @@ Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari _pull re
 
 Saya bukan desainer handal, jadi saya mengikuti saja apa yang sekiranya sudah terbukti. Slather sudah punya logo yang cakep, saya gunakan saja skema warnanya. Lalu saya jiplak plek-plek _styling_-nya Coveralls, termasuk desain tabel dan tampilan kodenya. Kredit untuk beberapa _library_ yang saya gunakan, sorotan pada kode menggunakan [`highlight.js`](https://highlightjs.org/), pengurutan dan filter menggunakan [list.js](http://www.listjs.com/).
 
-![Coveralls Report Table](/2015-06-07-extending-slather/slather_html_1.png)
-![Coveralls Line Coverage](/2015-06-07-extending-slather/slather_html_2.png)
+![Coveralls Report Table](2015-06-07-extending-slather/slather_html_1.png)
+![Coveralls Line Coverage](2015-06-07-extending-slather/slather_html_2.png)
 
 Untuk membangkitkan laporan html, gunakan opsi `--html`. Perintah ini akan menampilkan path dari laman indeks, tapi bisa juga gunakan opsi `--show` untuk membuka laporan secara otomatis di perambah.
 
