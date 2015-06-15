@@ -4,23 +4,23 @@ date: 2015-06-07 23:47 UTC
 tags: ruby, slather, objective-c
 ---
 
-Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam acaranya Cocoapods, [Test Jam](http://blog.cocoapods.org/Test-Jammin/). Inti acaranya adalah menambahkan test code ke pods yang sudah ada bersama-sama sebagai satu komunitas. Saat itulah saya mengenal yang namanya **slather** untuk pertama kali. READMORE
+Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam acaranya Cocoapods, [Test Jam](http://blog.cocoapods.org/Test-Jammin/). Inti acaranya adalah menambahkan test code ke pods yang sudah ada bersama-sama sebagai satu komunitas. Saat itulah saya mengenal yang namanya __Slather__ untuk pertama kali. READMORE
 
 [Slather](https://github.com/venmo/slather) adalah ruby gem yang menghasilkan laporan ulasan kode dari Xcode project dan mengintegrasikannya ke CI. Instalasinya cukup mudah, tinggal mengikuti [pedoman](https://github.com/venmo/slather#installation) yang tersedia.
 
-Setelah project terpasang dengan servis *code coverage* seperti [coveralls](https://coveralls.io), kita bisa meninjau hasil coverage kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.
+Setelah project terpasang dengan servis _code coverage_ seperti [coveralls](https://coveralls.io), kita bisa meninjau hasil _coverage_ kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.
 
 ![Coveralls Report Table](/extending-slather/coveralls_1.png)
 
 ## Penggunaan secara Lokal : Laporan HTML
 
-Terkadang, kita juga ingin mempunyai akses informasi yang sama tanpa harus update kode kita ke remote repository dan melihat dasbor di coveralls. Sla
+Seringkali, kita juga ingin mempunyai akses informasi yang sama dengan dasbor Coveralls tanpa harus update kode kita ke remote repository dan mengunjungi situsnya.
 
-With slather, you could have that information using the simple output mode using `-s`. But for me, this does not give much details needed. You only get coverage percentage for each file, but not __which lines__ are being covered. I don't want to push everytime just to check which line is being covered.
+Dengan Slather, kita bisa mendapatkan informasi sederhana dengan *simple output mode* menggunakan `-s`. Tapi untuk saya, ini tidak memberikan detil yang cukup. Kita hanya mendapatkan persentase untuk tiap file, tapi tanpa informasi __baris mana__ yang ter-_cover_. Saya tidak mau selalu update kode saya ke remote repository tiap kali ingin mengecek baris mana yang telah ter-_cover_.
 
-Sometimes, you also want the same information available locally. So you don't need to push any code just to get the information provided by coveralls. The simple output does not give much details. You only get coverage percentage for each file, but not __which lines__ are being covered.
+Saya pikir, kenapa saya tidak tambahkan saja fitur ini ke Slather? Keren kan kalau bisa menghasilkan reports sebagai laman HTML statik. Menggunakan file HTML berarti kita tidak perlu konfigurasi tambahan, aplikasi lain atau bahkan koneksi internet. Hanya perlu browser saja dan bisa langsung pakai.
 
-Having this problem, I'm thinking why don't I just extend slather's feature? It would be cool to have the ability to generate reports as static HTML pages. Making as static HTML means that you don't need further setup, other application nor connectivity. Just browser and you are good to go.
+Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari pull request yang telah terintegrasi, kita dapat 
 
 First step is to find how to add features. By just browsing the list of merged pull request, you will able to see how people are adding stuff to the project. I used [neonichu](https://github.com/neonichu)'s [GutterJsonOutput PR](https://github.com/venmo/slather/pull/24/files?diff=split) as a guide. Use github's file diffing to learn how a good contribution looks like.
 
