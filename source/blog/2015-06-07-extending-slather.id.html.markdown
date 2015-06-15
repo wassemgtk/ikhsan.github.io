@@ -20,27 +20,25 @@ Dengan Slather, kita bisa mendapatkan informasi sederhana dengan *simple output 
 
 Saya pikir, kenapa saya tidak tambahkan saja fitur ini ke Slather? Keren kan kalau bisa menghasilkan reports sebagai laman HTML statik. Menggunakan file HTML berarti kita tidak perlu konfigurasi tambahan, aplikasi lain atau bahkan koneksi internet. Hanya perlu browser saja dan bisa langsung pakai.
 
-Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari pull request yang telah terintegrasi, kita dapat 
+Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari _pull request_ yang telah terintegrasi, kita dapat mempelajari bagaimana orang lain menambahkan fitur ke sebuah project. Saya menggunakan PR-nya [neonichu]((https://github.com/neonichu)) saat dia menambahkan fitur [GutterJSON](https://github.com/venmo/slather/pull/24/files?diff=split) sebagai panduan saya. Sedikit tips, adalah gunakan _file diffing_-nya Github untuk melihat jelas apa-apa saja yang ditambahkan.
 
-First step is to find how to add features. By just browsing the list of merged pull request, you will able to see how people are adding stuff to the project. I used [neonichu](https://github.com/neonichu)'s [GutterJsonOutput PR](https://github.com/venmo/slather/pull/24/files?diff=split) as a guide. Use github's file diffing to learn how a good contribution looks like.
-
-I'm not of a designer so I followed what already worked. Slather already has a delightful logo, so I used its colour scheme. Then I replicate coveralls styling for the tables and the highlighted source code. Syntax highlighting is using [`highlight.js`](https://highlightjs.org/) and sorting-filtering is using [list.js](http://www.listjs.com/).
+Saya bukan desainer handal, jadi saya mengikuti saja apa yang sekiranya sudah terbukti. Slather sudah punya logo yang cakep, saya gunakan saja skema warnanya. Lalu saya jiplak plek-plek _styling_-nya Coveralls, termasuk desain tabel dan tampilan kodenya. Kredit untuk beberapa _library_ yang saya gunakan, sorotan pada kode menggunakan [`highlight.js`](https://highlightjs.org/), pengurutan dan filter menggunakan [list.js](http://www.listjs.com/).
 
 ![Coveralls Report Table](/extending-slather/slather_html_1.png)
 ![Coveralls Line Coverage](/extending-slather/slather_html_2.png)
 
-To generate the html report, use the `--html` flag. It will print the path of the index page by default, but you can use you could use '--show' flag to open it automatically in your browser.
+Untuk membangkitkan laporan html, gunakan opsi `--html`. Perintah ini akan menampilkan path dari laman indeks, tapi bisa juga gunakan opsi `--show` untuk membuka laporan secara otomatis di perambah.
 
 ```sh
 $ slather coverage --html --show path/to/project.xcodeproj
 ```
 
-## Kode telah terupdate 🎉
+## Kode telah terintegrasi 🎉
 
-Honestly, this is my first real experience on open source contribution. The responses from others are motivating and the end result was rewarding. I really hope that it will be used by many people. [HTML reports generation](https://github.com/venmo/slather/pull/76) is merged to slather 1.8 update. Woohoo.
+Sejujurnya, ini adalah pengalaman kali pertama dalam kontribusi open source yang terasa nyata. Respons dari lainnya sangat memotivasi dan hasilnya cukup membanggakan. Sangat diharapkan fitur ini akan digunakan banyak orang. Pembangkitan [laporan HTML code coverage](https://github.com/venmo/slather/pull/76) sudah terintegrasi ke Slather 1.8. Asik dah.
 
 ### Update WWDC15 : Xcode 7 telah memiliki fitur code coverage
 
-In WWDC 15, Apple announced code coverage support baked into Xcode. Developers would able to see right inside the code which lines are covered. Does it mean that slather + html reports will be futile?
+Saat WWDC15 kemarin, Apple mengumumkan bahwa fitur _code coverage_ telah tersedia di Xcode. Pemgembang dapat melihat di dalam aplikasi baris kode mana yang sudah ter-_cover_. Apakah ini berarti Slather dengan laporan HTML-nya sia-sia?
 
-I think slather with HTML report has its own advantages. HTMLs are not attached to Xcode, meaning you can do whatever you want with it. Whether to do local review, upload to your site, or integrate it to Jenkins. IMO, there are still values on having slather generating HTML reports.
+Pendapat saya laporan HTML tetap mempunyai keunggulannya tersendiri. HTML tidak tertempel pada Xcode, yang artinya laporan tersebut bisa dimacam-macamkan. Bisa digunakan untuk cek secara lokal tanpa internet, bisa diunggah di website, atau bisa juga ditempel di Jenkins. Masih banyak lah kemungkinan-kemungkinan lain yang bisa dieksplor dengan laporan HTML ini, jadi tentu saja masih punya nilainya tersendiri.

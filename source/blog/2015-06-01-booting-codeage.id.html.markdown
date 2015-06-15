@@ -3,21 +3,21 @@ title: Menyalakan Codage
 tags: ruby, middleman
 ---
 
-Aku tak merasa... READMORE
+Saya merasakan dorongan untuk memisahkan postingan yang berhubungan dengan tekonologi dari tumblr ke tempat yang lebih pas. Ada dua alasan, penyorotan untuk sintaks dari kode dan lokalisasi bahasa. Saya tahu bisa menggunakan gist untuk menulis kode di tumblr, tapi saya ingin fleksibilitas yang lebih lagi. READMORE
 
-I feel the urge to move my tech-related posts from tumblr to a better platform. Two reasons; code highlighting and localisation. I know you could use workarounds or just use gist for tumblr, but I need more flexibility.
+Setelah meriset beberapa opsi, akhirnya saya memutusakn untuk menggunakan [Middleman](https://middlemanapp.com/basics/blogging/). Alasannya;
 
-I researched options and decided to go with [Middleman](https://middlemanapp.com/basics/blogging/). Several reasons behind my decision;
+- platformnya aktif, dibuat dan dikelola oleh orang-orang jago di [thoughbot](http://thoughtbot.com)
+- berbasis ruby, yang memang ingin saya pelajari lebih lanjut
+- mendukung fitur [penyorotan kode](https://github.com/middleman/middleman-syntax) dan [bahasa lebih dari satu](https://middlemanapp.com/advanced/localization/)
+- bisa di-_deploy_ dengan github pages
 
-- it is an active platform which is created and maintained by great people from [thoughbot](http://thoughtbot.com),
-- it is based on ruby which I want to learn more about,
-- supports [syntax highlighting](https://github.com/middleman/middleman-syntax) and [localisation](https://middlemanapp.com/advanced/localization/), and
-- can be deployed using github pages
+Middleman menyediakan _template_ untuk mempercepat pembuatan blog. Walau dengan _template_ namun website tetap bisa dikostumisasi lebih lanjut. Takarannya ini yang pas untuk saya, seimbang antara kemudahan dan flesibilitas.
 
-Middleman provides templates to kickstart a blog, but also allowed endless customisation if you want to make a full on website. This is the sweet spot of balance between easiness and flexibility.
+Ada [pedoman yang asik](https://robots.thoughtbot.com/middleman-bourbon-walkthrough) untuk menata blog middleman Anda. Saya sangat menyarankannya jika ingin melakukan penataan lebih lanjut ke situs middleman Anda, bahkan pedoman ini yang saya gunakan untuk menata website ini menyerupai blog utama saya.
 
-There is a [great walkthrough](https://robots.thoughtbot.com/middleman-bourbon-walkthrough) on how to style out your middleman blog. I highly recommend it if you want to work your middleman site, even I used it to mimic the theme of my [main blog](http://ikhsan.me) into this site. For more info about the tools, check out [Bourbon](http://bourbon.io/) (Sass mixin library), [Neat](http://neat.bourbon.io/) (grid framework) and [Bitters](http://bitters.bourbon.io/) (default settings for Bourbon).
+Untuk info lebih lanjut dengan kakas-kakas middleman, bisa cek [Bourbon](http://bourbon.io/) (Sass mixin library), [Neat](http://neat.bourbon.io/) (grid framework) dan [Bitters](http://bitters.bourbon.io/) (konfigurasi standar untuk Bourbon).
 
-## Summary
+## Kesimpulan
 
-Although there are many things to setup, but I am pleased with the result. It was rewarding experience for a novice rubyist like me to have created, styled and setup my own site. Check the [source of this page](https://github.com/ikhsan/ikhsan.github.io/tree/develop) if you are interested.
+Walaupun banyak yang harus di-_setup_, tapi saya puas dengan hasilnya. Ga jelek-jelek amat lah untuk rubyist pemula seperti saya, untuk bisa membuat, menata dan menjalankan website saya. Cek juga [kode sumber](https://github.com/ikhsan/ikhsan.github.io/tree/develop) dari blog ini kali-kali tertarik.
