@@ -14,3 +14,8 @@
 @import "partials/layouts";
 @import "partials/tags";
 @import "partials/footer";
+
+pre.highlight {
+  overflow-x:scroll;
+  padding: 4px 6px 4px;
+}
