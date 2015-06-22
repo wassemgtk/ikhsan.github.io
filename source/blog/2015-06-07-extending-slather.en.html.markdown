@@ -10,7 +10,7 @@ Last month, I went to Facebook London for attending Cocoapods' [Test Jam](http:/
 
 Once your project is hooked to coverage service like [coveralls](https://coveralls.io), you will have the ability to review your coverage thoroughly via coveralls' web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.
 
-![Coveralls Report Table](2015-06-07-extending-slather/coveralls_1.png)
+![Coveralls Report Table](/2015-06-07-extending-slather/coveralls_1.png)
 
 ## Local Usage : HTML Reports
 
@@ -24,8 +24,8 @@ First step is to find how to add features. By just browsing the list of merged p
 
 I'm not of a designer so I followed what already worked. Slather already has a delightful logo, so I used its colour scheme. Then I replicate Coveralls styling for the tables and the highlighted source code. Syntax highlighting is using [`highlight.js`](https://highlightjs.org/) and sorting-filtering is using [list.js](http://www.listjs.com/).
 
-![Coveralls Report Table](2015-06-07-extending-slather/slather_html_1.png)
-![Coveralls Line Coverage](2015-06-07-extending-slather/slather_html_2.png)
+![Coveralls Report Table](/2015-06-07-extending-slather/slather_html_1.png)
+![Coveralls Line Coverage](/2015-06-07-extending-slather/slather_html_2.png)
 
 To generate the html report, use the `--html` flag. It will print the path of the index page by default, but you can use you could use '--show' flag to open it automatically in your browser.
 
