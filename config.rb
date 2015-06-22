@@ -14,7 +14,7 @@ activate :deploy do |deploy|
 end
 
 activate :blog do |blog|
-  blog.permalink = "{year}/{month}/{day}/{lang}/{title}.html"
+  blog.permalink = "{year}-{month}-{day}-{title}-{lang}.html"
   blog.sources = "{year}-{month}-{day}-{title}.{lang}.html"
 
   # blog.taglink = "tags/{tag}.html"
@@ -54,5 +54,5 @@ configure :build do
   activate :minify_javascript
 
   # Use relative URLs
-  # activate :relative_assets
+  activate :relative_assets
 end
