@@ -4,17 +4,13 @@ activate :syntax
 set :markdown_engine, :redcarpet
 set :markdown, :fenced_code_blocks => true, :smartypants => true
 
-configure :development do
-  set :debug_assets, true
-end
-
 activate :deploy do |deploy|
   deploy.method = :git
   deploy.branch = 'master'
 end
 
 activate :blog do |blog|
-  blog.permalink = "{year}-{month}-{day}-{title}-{lang}.html"
+  blog.permalink = "{year}-{month}-{day}-{title}.{lang}.html"
   blog.sources = "{year}-{month}-{day}-{title}.{lang}.html"
 
   # blog.taglink = "tags/{tag}.html"
@@ -52,7 +48,4 @@ set :images_dir, "img"
 configure :build do
   activate :minify_css
   activate :minify_javascript
-
-  # Use relative URLs
-  activate :relative_assets
 end
