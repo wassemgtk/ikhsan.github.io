@@ -3,6 +3,15 @@
 <%= Rouge::Themes::ThankfulEyes.render(:scope => '.highlight') %>
 
 .highlight {
-  margin: 1em 0 2em;
-  padding: 0 0.3em;
+  margin-bottom: 1em;
+}
+
+.highlight td.gutter {
+  padding-left: 0.3em;
+  width: 2.3em;
+}
+
+td.code > pre {
+  overflow-x:scroll;
+  padding-left: 2px;
 }
