@@ -6,8 +6,17 @@
 @import "base/base";
 @import "neat";
 
-#main {
-    @include outer-container;
+#main { @include outer-container; }
+
+.article-links {
+  margin: 0.5em 0 0;
+  @include outer-container;
+
+  .previous-link { @include span-columns(6); }
+  .next-link {
+    @include span-columns(6);
+    text-align: right;
+  }
 }
 
 @import "partials/nav";

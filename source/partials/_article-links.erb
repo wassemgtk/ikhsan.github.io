@@ -1,0 +1,25 @@
+<%
+sorted = articles.reverse
+index = sorted.index { |a| a.title == article.title }
+prev_article = index > 0 ? sorted[index - 1] : nil
+next_article = sorted[index + 1]
+%>
+
+<div class="article-links">
+  <div class="previous-link">
+    <% if prev_article.nil? %>
+    &nbsp;
+    <% else %>
+    <%= link_to "&larr; " + prev_article.title, prev_article.url %>
+    <% end %>
+  </div>
+
+  <div class="next-link">
+    <% if next_article.nil? %>
+    &nbsp;
+    <% else %>
+    <%= link_to next_article.title + " &rarr;", next_article.url %>
+    <% end %>
+  </div>
+
+</div>
