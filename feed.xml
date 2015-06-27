@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Codeage</title>
+  <subtitle>Ramblings about code</subtitle>
+  <id>http://codage.ikhsan.me/blog</id>
+  <link href="http://codage.ikhsan.me/blog"/>
+  <link href="http://codage.ikhsan.me/feed.xml" rel="self"/>
+  <updated>2015-06-09T05:32:00+01:00</updated>
+  <author>
+    <name>Ikhsan Assaat</name>
+  </author>
+  <entry>
+    <title>Fastlane di Jenkins dan Permasalahannya</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html"/>
+    <id>http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html</id>
+    <published>2015-06-09T05:32:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fastlane&lt;/strong&gt; akan membantu kita dalam mengkonfigurasi jalur &lt;em&gt;deployment&lt;/em&gt; yang kita punya. Ada beberapa keuntungan dalam menggunakan fastlane, apapun Continuous Integration (CI) yang kita gunakan, mau itu Travis di &lt;em&gt;cloud&lt;/em&gt;, Jenkins di mesin CI lokal atau bahkan mesin yang kita gunakan untuk pengembangan.  &lt;a href="https://fastlane.tools"&gt;Fastlane&lt;/a&gt; terdiri dari berbagai kakas untuk berbagai kepentingan pula. Tempat pertama yang perlu kita cek adalah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"&gt;daftar perintah-perintah&lt;/a&gt; yang bisa digunakan.&lt;/p&gt;
+
+&lt;p&gt;Memulai cukup cepat dan mudah. Fastlane bahkan punya asisten yang akan membantu kita &lt;em&gt;nyetting&lt;/em&gt; di awal.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;sudo&lt;span class="o"&gt;)&lt;/span&gt; gem install fastlane
+&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &amp;lt;folder dasar project&amp;gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;fastlane init
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Dan kita sudah siap! 👌&lt;/p&gt;
+
+&lt;h2&gt;Keuntungan dibanding Jenkins Biasa&lt;/h2&gt;
+
+&lt;h3&gt;Bisa Digunakan di manapun&lt;/h3&gt;
+
+&lt;p&gt;Fastlane dapat dijalankan di semua mesin yang terinstall ruby dan gem yang bersangkutan. Permulaan saya menggunakan Fastlane adalah saat kami di tempat kerja sedang pindah kantor, sehingga tidak punya akses ke server Jenkins. Namun, klien tetap ingin selalu terupdate dengan build terbaru. Dengan menggunakan Fastlane beserta file konfigurasinya, semua developer bisa membuat build yang sama tanpa perlu akses ke Jenkins.&lt;/p&gt;
+
+&lt;h3&gt;Konfigurasi Tersimpan dalam Repositori&lt;/h3&gt;
+
+&lt;p&gt;File konfigurasi (yang bernama &lt;code&gt;Fastfile&lt;/code&gt;) hanya berupa file teks biasa, jadi kita bisa dengan mudah menyimpannya dalam repositori. Kita bahkan tidak perlu lancar berbahasa Ruby karena sintaksnya yang mirip dengan bahasa Inggris biasa.&lt;/p&gt;
+
+&lt;h3&gt;Integrasi dengan Jenkins (yang Seharusnya Mudah)&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href="https://twitter.com/ashfurrow"&gt;Ash Furrow&lt;/a&gt; menulis &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md"&gt;panduan singkat&lt;/a&gt; dalam mengintegrasikan Fastlane ke dalam Jenkins. Kalau Jenkins dan Fastlane sudah terinstall, kita tinggal membuat job baru yang punya dua pekerjaan, mengambil kode sumber dari repositori (dengan plugin git atau SVN) dan mengeksekusi skrip perintah Fastlane (&lt;code&gt;fastlane &amp;lt;nama jalur&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Problem with Jenkins&lt;/h2&gt;
+
+&lt;p&gt;Integrasi dengan Jenkins semestinya mudah, namun saya menemukan beberapa masalah berdasarkan pengalaman saya.&lt;/p&gt;
+
+&lt;h3&gt;Jenkins Menggunakan Ruby dengan Versi yang Berbeda&lt;/h3&gt;
+
+&lt;p&gt;Pertama kali menjalankan &lt;em&gt;job&lt;/em&gt; di Jenkins, ia komplen karena tidak bisa mendeteksi perintah &lt;code&gt;Fastlane&lt;/code&gt;. Setelah dicek kembali dengan ssh, tampaknya semua telah terinstall dan baik-baik saja. Ternyata &lt;a href="http://stackoverflow.com/a/10519349/851515"&gt;solusinya cukup mudah&lt;/a&gt;, tinggal menggunakan &lt;em&gt;flag&lt;/em&gt; &lt;code&gt;-l&lt;/code&gt; agar menggunakan shell yang sama saat login.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&amp;lsquo;Execute shell&amp;rsquo; di Jenkins&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -l&lt;/span&gt;
+
+&lt;span class="c"&gt;# Saya sudah mengkofigurasi jalur bernama 'build' di `Fastfile`&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Keychain yang Terkunci&lt;/h3&gt;
+
+&lt;p&gt;Saya pernah mendapatkan error terkait code signing, yang menyebutkan bahwa keychain tidak bisa diakses karena terkunci. Solusi untuk masalah ini adalah menggunakan kakas &lt;code&gt;unlock-keychain&lt;/code&gt; dengan password admin Anda.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Execute shell&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;security -v unlock-keychain -p &lt;span class="s2"&gt;"&amp;lt;password admin&amp;gt;"&lt;/span&gt; &lt;span class="s2"&gt;"/Users/&amp;lt;username&amp;gt;/Library/Keychains/login.keychain"&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Error pada Codesigning&lt;/h3&gt;
+
+&lt;p&gt;Ini sebenarnya bukan masalah spesifik untuk Jenkins, tapi kalau Anda bertemu masalah dengan pesan error seperti &lt;a href="http://stackoverflow.com/a/26499526/851515"&gt;ini&lt;/a&gt;: &amp;ldquo;&lt;code&gt;/tmp/QYFSJIvu7W/Payload/XX.app/ResourceRules.plist: cannot read resources&lt;/code&gt;&amp;rdquo;, maka kita perlu menambahkan file &lt;code&gt;&amp;quot;ResourceRules.plist&amp;quot;&lt;/code&gt; ke dalam konfigurasi proyek di Xcode.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Klik target dari proyek Xcode &amp;gt; Build Settings &amp;gt; Code Signing Resource Rules Path&lt;/li&gt;
+&lt;li&gt;Tambahkan &lt;code&gt;$(SDKROOT)/ResourceRules.plist&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Error pada Codesigning (Lagi)&lt;/h3&gt;
+
+&lt;p&gt;Saya menemukan masalah ini saat menggunakan dua parameter dari perintah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#ipa"&gt;ipa&lt;/a&gt; : &lt;code&gt;&amp;#39;embed&amp;#39;&lt;/code&gt; and &lt;code&gt;&amp;#39;identity&amp;#39;&lt;/code&gt;. Perintah ini menggunakan kakas &lt;code&gt;codesign&lt;/code&gt; didalamnya. Tapi saya menemukan pesan error yang berujar &lt;code&gt;&amp;quot;code failed to satisfy specified code requirement(s)&amp;quot;&lt;/code&gt;. Sedikit googling, saya langsung menemukan sebuah &lt;a href="http://blog.hoachuck.biz/blog/2013/10/29/codesign-useful-info-in-xcode-5-dot-0-1/"&gt;artikel&lt;/a&gt; yang menerangkan bahwa saya mempunyai path &lt;code&gt;codesign_allocate&lt;/code&gt; yang salah.&lt;/p&gt;
+
+&lt;p&gt;Solusi dari permasalahan ini adalah dengan menambahkan &lt;code&gt;path&lt;/code&gt; tersebut secara &amp;ldquo;paksa&amp;rdquo;. Kita bisa melakukannya di skrip dalam Jenkins (opsi execute shell) atau menambahkannya di Fastfile kita. Kalau saya tinggal menambahkannya saja di Fastfile;&lt;/p&gt;
+&lt;div class="highlight ruby"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="n"&gt;platform&lt;/span&gt; &lt;span class="ss"&gt;:ios&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+  &lt;span class="n"&gt;desc&lt;/span&gt; &lt;span class="s2"&gt;"Making a build"&lt;/span&gt;
+  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:build&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Pengkoreksian path untuk kakas codesign_allocate&lt;/span&gt;
+    &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'CODESIGN_ALLOCATE'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"&lt;/span&gt;
+
+    &lt;span class="n"&gt;ipa&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="ss"&gt;configuration: &lt;/span&gt;&lt;span class="s2"&gt;"Debug"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;scheme: &lt;/span&gt;&lt;span class="s1"&gt;'MyApp'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# skema aplikasi&lt;/span&gt;
+      &lt;span class="ss"&gt;destination: &lt;/span&gt;&lt;span class="s2"&gt;"build"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# direktori tujuan&lt;/span&gt;
+      &lt;span class="ss"&gt;embed: &lt;/span&gt;&lt;span class="s1"&gt;'fastlane/my_distribution_cert.mobileprovision'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;identity: &lt;/span&gt;&lt;span class="s1"&gt;'iPhone Distribution: Ikhsan Assaat'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Fastlane on Jenkins and its Workarounds</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/en/fastlane-on-jenkins.html"/>
+    <id>http://codage.ikhsan.me/blog/en/fastlane-on-jenkins.html</id>
+    <published>2015-06-09T05:32:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fastlane&lt;/strong&gt; helps you configure your deployment pipeline. There are advantages by using fastlane whichever CI solution you have, whether it&amp;rsquo;s Travis in the cloud, Jenkins in your local CI machine or even your own dev machine.  &lt;a href="https://fastlane.tools"&gt;Fastlane&lt;/a&gt; comprises different toolsets for different purposes. First thing you might want to look at is its &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"&gt;list of actions&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Starting is quick and easy. Fastlane even has its own setup assistant to help you out.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;sudo&lt;span class="o"&gt;)&lt;/span&gt; gem install fastlane
+&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &amp;lt;your project root folder&amp;gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;fastlane init
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;And you are good to go! 👌&lt;/p&gt;
+
+&lt;h2&gt;Advantages Compared to Normal Jenkins Job&lt;/h2&gt;
+
+&lt;h3&gt;Ubiquity&lt;/h3&gt;
+
+&lt;p&gt;Fastlane runs in any machine that has ruby and Fastlane gem installed. We had a problem accessing our Jenkins server for days because we are moving out. In the other hand, clients still need their builds ready.  By having Fastlane and its config file in each developer&amp;rsquo;s machine, everyone could still make the same build without access to our Jenkins server.&lt;/p&gt;
+
+&lt;h3&gt;Config inside Repository&lt;/h3&gt;
+
+&lt;p&gt;The config files (known as &lt;code&gt;Fastfile&lt;/code&gt;) are just plain texts, so we could just easily include it inside our repository. You don&amp;rsquo;t even need to be proficient in ruby because the syntax is pretty close to plain english.&lt;/p&gt;
+
+&lt;h3&gt;Jenkins integration is (or should be) Easy&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href="https://twitter.com/ashfurrow"&gt;Ash Furrow&lt;/a&gt; wrote a &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md"&gt;short and sweet guideline&lt;/a&gt; on integrating Fastlane to Jenkins. Once Jenkins and Fastlane is installed in your CI machine, you need to create a job that has two things: fetching the repository (using git or SVN plugin) and execute the Fastlane&amp;rsquo;s script (&lt;code&gt;fastlane &amp;lt;your lane&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Problem with Jenkins&lt;/h2&gt;
+
+&lt;p&gt;Integrating with Jenkins supposed to be effortless, but in my experience I met few problems along the way.&lt;/p&gt;
+
+&lt;h3&gt;Jenkins is Using Different Ruby&lt;/h3&gt;
+
+&lt;p&gt;First time I run the job, Jenkins complained that it cannot detect the &lt;code&gt;fastlane&lt;/code&gt; command. I double checked via ssh and everything are installed. My &lt;a href="http://stackoverflow.com/a/10519349/851515"&gt;workaround was simple&lt;/a&gt;, I specify the &lt;code&gt;-l&lt;/code&gt; flag to use the login shell.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&amp;lsquo;Execute shell&amp;rsquo; in Jenkins&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -l&lt;/span&gt;
+
+&lt;span class="c"&gt;# I have a 'build' lane configured in `Fastfile`&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Locked Keychain&lt;/h3&gt;
+
+&lt;p&gt;I had a Code Signing error that which says the login keychain is locked. To resolve this use &lt;code&gt;unlock-keychain&lt;/code&gt; with your admin password.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Execute shell&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;security -v unlock-keychain -p &lt;span class="s2"&gt;"&amp;lt;your password&amp;gt;"&lt;/span&gt; &lt;span class="s2"&gt;"/Users/&amp;lt;username&amp;gt;/Library/Keychains/login.keychain"&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Codesigning Error&lt;/h3&gt;
+
+&lt;p&gt;This is not necessarily a Jenkins-specific problem, but if you come across this problem like &lt;a href="http://stackoverflow.com/a/26499526/851515"&gt;this&lt;/a&gt;: &amp;ldquo;&lt;code&gt;/tmp/QYFSJIvu7W/Payload/XX.app/ResourceRules.plist: cannot read resources&lt;/code&gt;&amp;rdquo;, then you need to add the &lt;code&gt;&amp;quot;ResourceRules.plist&amp;quot;&lt;/code&gt; to your project.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Click on your project&amp;rsquo;s target &amp;gt; Build Settings &amp;gt; Code Signing Resource Rules Path&lt;/li&gt;
+&lt;li&gt;add &lt;code&gt;$(SDKROOT)/ResourceRules.plist&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;(Another) Codesigning Error&lt;/h3&gt;
+
+&lt;p&gt;I stumbled upon this issue when I&amp;rsquo;m using these two &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#ipa"&gt;ipa actions&lt;/a&gt; paramaters: &lt;code&gt;&amp;#39;embed&amp;#39;&lt;/code&gt; and &lt;code&gt;&amp;#39;identity&amp;#39;&lt;/code&gt;. It uses &lt;code&gt;codesign&lt;/code&gt; tools in the background. But I had an error saying that &lt;code&gt;&amp;quot;code failed to satisfy specified code requirement(s)&amp;quot;&lt;/code&gt;. After quick search on the internet, I found &lt;a href="http://blog.hoachuck.biz/blog/2013/10/29/codesign-useful-info-in-xcode-5-dot-0-1/"&gt;an article&lt;/a&gt; that explains that I&amp;rsquo;m having an incorrect codesign_allocate&amp;rsquo;s path.&lt;/p&gt;
+
+&lt;p&gt;The workaround it to force adding it to the job. You can do that either inside the jenkins script or put it inside the Fastfile. My approach is to add it in my Fastfile;&lt;/p&gt;
+&lt;div class="highlight ruby"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="n"&gt;platform&lt;/span&gt; &lt;span class="ss"&gt;:ios&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+  &lt;span class="n"&gt;desc&lt;/span&gt; &lt;span class="s2"&gt;"Making a build"&lt;/span&gt; &lt;span class="c1"&gt;# name of the lane&lt;/span&gt;
+  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:build&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# force change environment variables for codesign_allocate tool&lt;/span&gt;
+    &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'CODESIGN_ALLOCATE'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"&lt;/span&gt;
+
+    &lt;span class="n"&gt;ipa&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="ss"&gt;configuration: &lt;/span&gt;&lt;span class="s2"&gt;"Debug"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;scheme: &lt;/span&gt;&lt;span class="s1"&gt;'MyApp'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# your scheme&lt;/span&gt;
+      &lt;span class="ss"&gt;destination: &lt;/span&gt;&lt;span class="s2"&gt;"build"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# your destination directory&lt;/span&gt;
+      &lt;span class="ss"&gt;embed: &lt;/span&gt;&lt;span class="s1"&gt;'fastlane/my_distribution_cert.mobileprovision'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# your distribution profile name&lt;/span&gt;
+      &lt;span class="ss"&gt;identity: &lt;/span&gt;&lt;span class="s1"&gt;'iPhone Distribution: Ikhsan Assaat'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# your identity&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Menambahkan Fitur Slather</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/extending-slather.html"/>
+    <id>http://codage.ikhsan.me/blog/id/extending-slather.html</id>
+    <published>2015-06-08T00:47:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam acaranya Cocoapods, &lt;a href="http://blog.cocoapods.org/Test-Jammin/"&gt;Test Jam&lt;/a&gt;. Inti acaranya adalah menambahkan test code ke pods yang sudah ada bersama-sama sebagai satu komunitas. Saat itulah saya mengenal yang namanya &lt;strong&gt;Slather&lt;/strong&gt; untuk pertama kali. &lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/venmo/slather"&gt;Slather&lt;/a&gt; adalah ruby gem yang menghasilkan laporan ulasan kode dari Xcode project dan mengintegrasikannya ke CI. Instalasinya cukup mudah, tinggal mengikuti &lt;a href="https://github.com/venmo/slather#installation"&gt;pedoman&lt;/a&gt; yang tersedia.&lt;/p&gt;
+
+&lt;p&gt;Setelah project terpasang dengan servis &lt;em&gt;code coverage&lt;/em&gt; seperti &lt;a href="https://coveralls.io"&gt;coveralls&lt;/a&gt;, kita bisa meninjau hasil &lt;em&gt;coverage&lt;/em&gt; kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/coveralls_1.png" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Penggunaan secara Lokal : Laporan HTML&lt;/h2&gt;
+
+&lt;p&gt;Seringkali, kita juga ingin mempunyai akses informasi yang sama dengan dasbor Coveralls tanpa harus update kode kita ke remote repository dan mengunjungi situsnya.&lt;/p&gt;
+
+&lt;p&gt;Dengan Slather, kita bisa mendapatkan informasi sederhana dengan &lt;em&gt;simple output mode&lt;/em&gt; menggunakan &lt;code&gt;-s&lt;/code&gt;. Tapi untuk saya, ini tidak memberikan detil yang cukup. Kita hanya mendapatkan persentase untuk tiap file, tapi tanpa informasi &lt;strong&gt;baris mana&lt;/strong&gt; yang ter-&lt;em&gt;cover&lt;/em&gt;. Saya tidak mau selalu update kode saya ke remote repository tiap kali ingin mengecek baris mana yang telah ter-&lt;em&gt;cover&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Saya pikir, kenapa saya tidak tambahkan saja fitur ini ke Slather? Keren kan kalau bisa menghasilkan reports sebagai laman HTML statik. Menggunakan file HTML berarti kita tidak perlu konfigurasi tambahan, aplikasi lain atau bahkan koneksi internet. Hanya perlu browser saja dan bisa langsung pakai.&lt;/p&gt;
+
+&lt;p&gt;Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari &lt;em&gt;pull request&lt;/em&gt; yang telah terintegrasi, kita dapat mempelajari bagaimana orang lain menambahkan fitur ke sebuah project. Saya menggunakan PR-nya &lt;a href="(https://github.com/neonichu)"&gt;neonichu&lt;/a&gt; saat dia menambahkan fitur &lt;a href="https://github.com/venmo/slather/pull/24/files?diff=split"&gt;GutterJSON&lt;/a&gt; sebagai panduan saya. Sedikit tips, adalah gunakan &lt;em&gt;file diffing&lt;/em&gt;-nya Github untuk melihat jelas apa-apa saja yang ditambahkan.&lt;/p&gt;
+
+&lt;p&gt;Saya bukan desainer handal, jadi saya mengikuti saja apa yang sekiranya sudah terbukti. Slather sudah punya logo yang cakep, saya gunakan saja skema warnanya. Lalu saya jiplak plek-plek &lt;em&gt;styling&lt;/em&gt;-nya Coveralls, termasuk desain tabel dan tampilan kodenya. Kredit untuk beberapa &lt;em&gt;library&lt;/em&gt; yang saya gunakan, sorotan pada kode menggunakan &lt;a href="https://highlightjs.org/"&gt;&lt;code&gt;highlight.js&lt;/code&gt;&lt;/a&gt;, pengurutan dan filter menggunakan &lt;a href="http://www.listjs.com/"&gt;list.js&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/slather_html_1.png" /&gt;
+&lt;img alt="Coveralls Line Coverage" src="/blog/2015-06-07-extending-slather/slather_html_2.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Untuk membangkitkan laporan html, gunakan opsi &lt;code&gt;--html&lt;/code&gt;. Perintah ini akan menampilkan path dari laman indeks, tapi bisa juga gunakan opsi &lt;code&gt;--show&lt;/code&gt; untuk membuka laporan secara otomatis di perambah.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;slather coverage --html --show path/to/project.xcodeproj
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h2&gt;Kode telah terintegrasi 🎉&lt;/h2&gt;
+
+&lt;p&gt;Sejujurnya, ini adalah pengalaman kali pertama dalam kontribusi open source yang terasa nyata. Respons dari lainnya sangat memotivasi dan hasilnya cukup membanggakan. Sangat diharapkan fitur ini akan digunakan banyak orang. Pembangkitan &lt;a href="https://github.com/venmo/slather/pull/76"&gt;laporan HTML code coverage&lt;/a&gt; sudah terintegrasi ke Slather 1.8. Asik dah.&lt;/p&gt;
+
+&lt;h3&gt;Update WWDC15 : Xcode 7 telah memiliki fitur code coverage&lt;/h3&gt;
+
+&lt;p&gt;Saat WWDC15 kemarin, Apple mengumumkan bahwa fitur &lt;em&gt;code coverage&lt;/em&gt; telah tersedia di Xcode. Pemgembang dapat melihat di dalam aplikasi baris kode mana yang sudah ter-&lt;em&gt;cover&lt;/em&gt;. Apakah ini berarti Slather dengan laporan HTML-nya sia-sia?&lt;/p&gt;
+
+&lt;p&gt;Pendapat saya laporan HTML tetap mempunyai keunggulannya tersendiri. HTML tidak tertempel pada Xcode, yang artinya laporan tersebut bisa dimacam-macamkan. Bisa digunakan untuk cek secara lokal tanpa internet, bisa diunggah di website, atau bisa juga ditempel di Jenkins. Masih banyak lah kemungkinan-kemungkinan lain yang bisa dieksplor dengan laporan HTML ini, jadi tentu saja masih punya nilainya tersendiri.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Extending Slather</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/en/extending-slather.html"/>
+    <id>http://codage.ikhsan.me/blog/en/extending-slather.html</id>
+    <published>2015-06-08T00:47:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;Last month, I went to Facebook London for attending Cocoapods&amp;rsquo; &lt;a href="http://blog.cocoapods.org/Test-Jammin/"&gt;Test Jam&lt;/a&gt;. The gist of the event is adding tests for established posts together as community. That&amp;rsquo;s when I heard &lt;strong&gt;slather&lt;/strong&gt; for the first time. &lt;/p&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/venmo/slather"&gt;Slather&lt;/a&gt; is a ruby gem that generates code coverage reports from your Xcode project and hook it into CI. Installation and usage is simple, you could find your way to their &lt;a href="https://github.com/venmo/slather#installation"&gt;extensive guide&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Once your project is hooked to coverage service like &lt;a href="https://coveralls.io"&gt;coveralls&lt;/a&gt;, you will have the ability to review your coverage thoroughly via coveralls&amp;rsquo; web interface. Coveralls dashboard gives you all the data that you need; total percentage, tabular data of covered files and highlighted source code.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/coveralls_1.png" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Local Usage : HTML Reports&lt;/h2&gt;
+
+&lt;p&gt;Sometimes, you also want the same information available locally. So you don&amp;rsquo;t need to push any code just to get the information provided by coveralls.&lt;/p&gt;
+
+&lt;p&gt;With slather, you could have that information using the simple output mode using &lt;code&gt;-s&lt;/code&gt;. But for me, this does not give much details needed. You only get coverage percentage for each file, but not &lt;strong&gt;which lines&lt;/strong&gt; are being covered. I don&amp;rsquo;t want to push everytime just to check which line is being covered.&lt;/p&gt;
+
+&lt;p&gt;Having this problem, I&amp;rsquo;m thinking why don&amp;rsquo;t I just extend slather&amp;rsquo;s feature? It would be cool to have the ability to generate reports as static HTML pages. Making as static HTML means that you don&amp;rsquo;t need further setup, other application nor connectivity. Just browser and you are good to go.&lt;/p&gt;
+
+&lt;p&gt;First step is to find how to add features. By just browsing the list of merged pull request, you will able to see how people are adding stuff to the project. I used &lt;a href="https://github.com/neonichu"&gt;neonichu&lt;/a&gt;&amp;rsquo;s &lt;a href="https://github.com/venmo/slather/pull/24/files?diff=split"&gt;GutterJsonOutput PR&lt;/a&gt; as a guide. Use github&amp;rsquo;s file diffing to learn how a good contribution looks like.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m not of a designer so I followed what already worked. Slather already has a delightful logo, so I used its colour scheme. Then I replicate Coveralls styling for the tables and the highlighted source code. Syntax highlighting is using &lt;a href="https://highlightjs.org/"&gt;&lt;code&gt;highlight.js&lt;/code&gt;&lt;/a&gt; and sorting-filtering is using &lt;a href="http://www.listjs.com/"&gt;list.js&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/slather_html_1.png" /&gt;
+&lt;img alt="Coveralls Line Coverage" src="/blog/2015-06-07-extending-slather/slather_html_2.png" /&gt;&lt;/p&gt;
+
+&lt;p&gt;To generate the html report, use the &lt;code&gt;--html&lt;/code&gt; flag. It will print the path of the index page by default, but you can use you could use &amp;rsquo;&amp;ndash;show&amp;rsquo; flag to open it automatically in your browser.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;slather coverage --html --show path/to/project.xcodeproj
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h2&gt;It&amp;rsquo;s merged 🎉&lt;/h2&gt;
+
+&lt;p&gt;Honestly, this is my first real experience on open source contribution. The responses from others are motivating and the end result was rewarding. I really hope that it will be used by many people. &lt;a href="https://github.com/venmo/slather/pull/76"&gt;HTML reports generation&lt;/a&gt; is merged to Slather 1.8 update. Woohoo.&lt;/p&gt;
+
+&lt;h3&gt;Update WWDC15 : Xcode 7&amp;rsquo;s code coverage support&lt;/h3&gt;
+
+&lt;p&gt;In WWDC 15, Apple announced code coverage support baked into Xcode. Developers would able to see right inside the code which lines are covered. Does it mean that Slather + html reports will be futile?&lt;/p&gt;
+
+&lt;p&gt;I think slather with HTML report has its own advantages. HTMLs are not attached to Xcode, meaning you can do whatever you want with it. Whether to do local review, upload to your site, or integrate it to Jenkins. IMO, there are still values on having slather generating HTML reports.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Menyalakan Codage</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/booting-codeage.html"/>
+    <id>http://codage.ikhsan.me/blog/id/booting-codeage.html</id>
+    <published>2015-06-01T01:00:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;Saya merasakan dorongan untuk memisahkan postingan yang berhubungan dengan tekonologi dari tumblr ke tempat yang lebih pas. Ada dua alasan, penyorotan untuk sintaks dari kode dan lokalisasi bahasa. Saya tahu bisa menggunakan gist untuk menulis kode di tumblr, tapi saya ingin fleksibilitas yang lebih lagi. &lt;/p&gt;
+
+&lt;p&gt;Setelah meriset beberapa opsi, akhirnya saya memutusakn untuk menggunakan &lt;a href="https://middlemanapp.com/basics/blogging/"&gt;Middleman&lt;/a&gt;. Alasannya;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;platformnya aktif, dibuat dan dikelola oleh orang-orang jago di &lt;a href="http://thoughtbot.com"&gt;thoughbot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;berbasis ruby, yang memang ingin saya pelajari lebih lanjut&lt;/li&gt;
+&lt;li&gt;mendukung fitur &lt;a href="https://github.com/middleman/middleman-syntax"&gt;penyorotan kode&lt;/a&gt; dan &lt;a href="https://middlemanapp.com/advanced/localization/"&gt;bahasa lebih dari satu&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;bisa di-&lt;em&gt;deploy&lt;/em&gt; dengan github pages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Middleman menyediakan &lt;em&gt;template&lt;/em&gt; untuk mempercepat pembuatan blog. Walau dengan &lt;em&gt;template&lt;/em&gt; namun website tetap bisa dikostumisasi lebih lanjut. Takarannya ini yang pas untuk saya, seimbang antara kemudahan dan flesibilitas.&lt;/p&gt;
+
+&lt;p&gt;Ada &lt;a href="https://robots.thoughtbot.com/middleman-bourbon-walkthrough"&gt;pedoman yang asik&lt;/a&gt; untuk menata blog middleman Anda. Saya sangat menyarankannya jika ingin melakukan penataan lebih lanjut ke situs middleman Anda, bahkan pedoman ini yang saya gunakan untuk menata website ini menyerupai blog utama saya.&lt;/p&gt;
+
+&lt;p&gt;Untuk info lebih lanjut dengan kakas-kakas middleman, bisa cek &lt;a href="http://bourbon.io/"&gt;Bourbon&lt;/a&gt; (Sass mixin library), &lt;a href="http://neat.bourbon.io/"&gt;Neat&lt;/a&gt; (grid framework) dan &lt;a href="http://bitters.bourbon.io/"&gt;Bitters&lt;/a&gt; (konfigurasi standar untuk Bourbon).&lt;/p&gt;
+
+&lt;h2&gt;Kesimpulan&lt;/h2&gt;
+
+&lt;p&gt;Walaupun banyak yang harus di-&lt;em&gt;setup&lt;/em&gt;, tapi saya puas dengan hasilnya. Ga jelek-jelek amat lah untuk rubyist pemula seperti saya, untuk bisa membuat, menata dan menjalankan website saya. Cek juga &lt;a href="https://github.com/ikhsan/ikhsan.github.io/tree/develop"&gt;kode sumber&lt;/a&gt; dari blog ini kali-kali tertarik.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Booting Codeage</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/en/booting-codeage.html"/>
+    <id>http://codage.ikhsan.me/blog/en/booting-codeage.html</id>
+    <published>2015-06-01T01:00:00+01:00</published>
+    <updated>2015-06-27T16:19:47+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;I feel the urge to detach my tech-related posts from tumblr to a better platform. Two reasons;  code syntax highlighting and localisation. I know you could use workarounds or just use gist for tumblr, but I need more flexibility. &lt;/p&gt;
+
+&lt;p&gt;I researched options and decided to go with &lt;a href="https://middlemanapp.com/basics/blogging/"&gt;Middleman&lt;/a&gt;. Several reasons behind my decision;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;it is an active platform which is created and maintained by great people from &lt;a href="http://thoughtbot.com"&gt;thoughbot&lt;/a&gt;,&lt;/li&gt;
+&lt;li&gt;it is based on ruby which I want to learn more about,&lt;/li&gt;
+&lt;li&gt;supports &lt;a href="https://github.com/middleman/middleman-syntax"&gt;syntax highlighting&lt;/a&gt; and &lt;a href="https://middlemanapp.com/advanced/localization/"&gt;localisation&lt;/a&gt;, and&lt;/li&gt;
+&lt;li&gt;can be deployed using github pages (free hosting ftw)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Middleman provides templates to kickstart a blog. Even so, it still allows endless customisation if you want to make a full on customised website. This is the sweet spot of balance between easiness and flexibility.&lt;/p&gt;
+
+&lt;p&gt;There is a &lt;a href="https://robots.thoughtbot.com/middleman-bourbon-walkthrough"&gt;great walkthrough&lt;/a&gt; on how to style out your middleman blog. I highly recommend it if you want to work your middleman site, even I used it to mimic the theme of my &lt;a href="http://ikhsan.me"&gt;main blog&lt;/a&gt; into this site.&lt;/p&gt;
+
+&lt;p&gt;For more info about the tools, check out &lt;a href="http://bourbon.io/"&gt;Bourbon&lt;/a&gt; (Sass mixin library), &lt;a href="http://neat.bourbon.io/"&gt;Neat&lt;/a&gt; (grid framework) and &lt;a href="http://bitters.bourbon.io/"&gt;Bitters&lt;/a&gt; (default settings for Bourbon).&lt;/p&gt;
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;Although there are many things to setup, but I am pleased with the result. It was rewarding experience for a novice rubyist like me to have created, styled and set up my own site. Check the &lt;a href="https://github.com/ikhsan/ikhsan.github.io/tree/develop"&gt;source of this page&lt;/a&gt; if you are interested.&lt;/p&gt;
+</content>
+  </entry>
+</feed>
