@@ -2,7 +2,7 @@ activate :i18n, :langs => [:en, :id]
 
 activate :syntax, :line_numbers => true
 set :markdown_engine, :redcarpet
-set :markdown, :fenced_code_blocks => true, :smartypants => true
+set :markdown, :fenced_code_blocks => true, :smartypants => true, :footnotes => true
 
 activate :deploy do |deploy|
   deploy.method = :git
@@ -26,9 +26,9 @@ activate :blog do |blog|
   blog.tag_template = "tag.html"
   blog.calendar_template = "calendar.html"
 
-  blog.paginate = true
-  blog.per_page = 5
-  blog.page_link = "page/{num}"
+  # blog.paginate = true
+  # blog.per_page = 5
+  # blog.page_link = "page/{num}"
 end
 
 page "/feed.xml", layout: false
