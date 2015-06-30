@@ -4,22 +4,29 @@ date: 2015-06-28 16:18 UTC
 tags: objective-c, swift
 ---
 
-Setelah melihat beberapa video WWDC dalam 2 minggu terakhir, saya akhirnya mencoba fitur-fitur baru dari xcode 7 dan swift. Sekedar iseng-iseng, saya menggunakan program sederhana yang saya buat tahun lalu untuk coding test dari [Songkick](https://songkick.com). Saya namakan "__On Tour__", ide dasar aplikasinya adalah untuk melihat jalur tur band-band kesayangan di peta.
+Setelah melihat beberapa video WWDC dalam 2 minggu terakhir, saya akhirnya mencoba fitur-fitur baru dari xcode 7 dan Swift. Sekedar iseng-iseng, saya menggunakan program sederhana yang saya buat tahun lalu untuk coding test dari [Songkick](https://api.songkick.com). Saya namakan "__On Tour__", ide dasar aplikasinya adalah untuk melihat jalur tur band-band kesayangan di peta.
 
-Berikut adalah beberapa catatan dan kesan saya saat mencoba menulis ulang program mainan saya dari objective-c ke swift 2.0.
+< gambar >
 
-## Type Safety
-Menurut saya ini adalah jawaban utama pada pertanyaan 'kenapa harus pindah ke swift'. Kita pasti sering mendapatkan crash karena kita tidak memanggil nil objek, atau misalnya kita casting objek yang tidak tepat. Pada Objective-C, kesalahan macam ini tidak bisa ditangkap pada saat compile time, sehingga kita kena getahnya pada saat runtime (alias crash).
+Berikut adalah beberapa catatan dan kesan saya saat mencoba menulis ulang prototipe fitur saya dari objective-C ke swift 2.0.
 
-Untungnya pada Swift, bahasa ini memaksa kita untuk lebih berhati-hati lagi. Kita lihat cuplikan dua kode dari On Tour;
+## Error Handling
+Fitur bahasa yang memaksa kita untuk memikirkan lebih seksama dengan error handling, seperti optional, guard, throw.
 
-Ini hanya contoh kecil dari Type Safety, namun semakin sering menggunakannya saya semakin suka dengan Swift yang lebih strict.
+### Optional
+xxx
 
-## Enumeration dan Generics
+### Guard
+xxx
 
-Kombinasi swift enumeration and generics sangatlah powerful.
+### Throws
+xxx
 
-Result cocok untuk asynchronous result.
+## Enumeration + Generics = Result Enum
+
+http://natashatherobot.com/swift-generics-box/
+
+Kombinasi enum and generics pada swift sangatlah _powerful_. Ini bukanlah hal baru pada Swift, kita sudah bisa menggunakan kekuatan enumeration sejak versi pertama dari Swift.
 
 ```swift
 enum Result<T, Error: ErrorType> {
@@ -28,9 +35,11 @@ enum Result<T, Error: ErrorType> {
 }
 ```
 
+Result cocok untuk asynchronous result.
+
 Coba bandingkan method-method ini. Perhatikan value type parameternya.
 
-```objective-c
+```objc
 + (NSURLSessionDataTask *)searchArtist:(NSString *)name
     page:(NSUInteger)page
     completion:(void (^)(NSArray *results, NSError *error))completion;
@@ -44,13 +53,34 @@ class func searchArtist(
 )
 ```
 
-## Error Handling
-Fitur bahasa yang memaksa kita untuk memikirkan lebih seksama dengan error handling, seperti optional, guard, throw.
+## @Testable
 
-## Sintaks
-Walaupun swift terasa lebih verbose karena error handling dan type safety memaksa kita lebih rinci dalam ngoding, tapi ternyata kode yang saya hasilkan lebih sedikit. Saya hitung baris kode pada dua aplikasi yang sama, di proyek Objective-C terdapat xxx baris sedangkan di Swift hanya xxx baris.
+http://natashatherobot.com/swift-2-xcode-7-unit-testing-access/
 
-Memang saya menggunakan satu library untuk parsing JSON (karena parsing JSON tanpa library terlihat sangat ribet), namun umumnya jumlah kode akan berkurang.
+## Jumlah Baris pada Kode
+Jumlah baris kode bukanlah metrik penentu kualitas sebuah kode, namun untuk mencari metrik yang sederhana maka akan tetap saya gunakan. Menulis kode Swift harus lebih terinci karena sifatnya _type safety_, walau begitu jumlah baris kodenya lebih sedikit dibanding Objective-C.
+
+Untuk menghitung jumlah baris kode, kita bisa menggunakan perintah `find` dari terminal:
+
+```sh
+$ find . \( -iname \*.m -o -iname \*.h -o -iname \*.swift \) -exec wc -l '{}' \+
+```
+
+Kode Objective-C
+
+* total +-1370 baris
+* dua file yang melebihi 200 baris, yaitu sebuah kelas `ViewController` dan kelas Networking untuk API.
+
+Kode Swift
+
+* total +-980 baris [^1]
+* maksimal jumlah baris untuk sebuah file : 145 baris untuk sebuah kelas `ViewController`
+
+Menggunakan Swift memang membuat kode menjadi lebih ramping. Sintaks Swift terlihat lebih sederhana dan lebih nyaman dilihat. Tidak ada detil rumit yang tidak perlu, seperti bintang untuk _pointer_, dua bintang untuk passing `NSError` dan titik koma pada akhir baris.
+
+Compiler Swift juga pintar dalam menyimpulkan tipe data. Sehingga kita tidak perlu menulis secara gamblang semua tipe variabel atau fungsi seperti yang kita lakukan di Objective-C.
+
+Terakhir, saya menggunakan `class extension` pada kelas-kelas berbeda sehingga saya bisa memisahkan tanggung jawab dari satu kelas ke beberapa file terpisah.
 
 ## Limitation
 
@@ -58,6 +88,11 @@ UI testing masih suka crash dan rusak2, terutama kalau klik2 dengan cepat
 
 Tooling masih suka crash, walau sudah jauh lebih baik dari sebelumnya. yang saya sayangkan fitur playground yang masih sangat fragile. Saya sering suka membuka playground untuk mengecek kebenaran ide di kepala saya  sebelum digabungkan di aplikasi utama. Namun apa daya karena suka crash akhirnya saya koding langsung di aplikasi utama.
 
-# Kesimpulan
+## Kesimpulan
 
-Ini adalah waktu yang exciting untuk menjadi Swift developer. Serunya lagi, fitur-fitur bahasa ini masih akan terus berubah dan berkembang.
+Ini adalah waktu yang exciting untuk menjadi Swift developer. kenapa?
+
+Fitur-fitur bahasa ini masih akan terus berubah dan berkembang.
+
+
+[^1]: Saya sedikit curang karena pada kode Swift karena menggunakan sebuah library pemilahan JSON yang tidak saya masukkan dalam perhitungan. Di Swift, pemilahan data JSON yang sederhana sekalipun menurut saya masih dirasa ribet dan memang masih menjadi topik diskusi yang aktif di komunitas Swift. Sehingga saya memutuskan untuk menggunakan SwiftyJSON pada Podfile saya untuk menyederhanakan masalah.
