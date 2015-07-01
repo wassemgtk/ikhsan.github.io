@@ -8,10 +8,10 @@ Setelah melihat beberapa video WWDC dalam 2 minggu terakhir, saya akhirnya menco
 
 ![On Tour](blog/2015-06-28-porting-mini-project-objc-to-swift/ontour.gif)
 
-Berikut adalah beberapa catatan dan kesan saya saat mencoba menulis ulang prototipe fitur saya dari Objective-C ke Swift 2.0.
+Berikut adalah beberapa catatan dan kesan saya saat mencoba menulis ulang basis kode dari Objective-C ke Swift 2.0.
 
-## Error Handling
-Ada beberapa fitur bahasa Swift yang menurut saya sengaja dirancang agar kita memikirkan lebih seksama dengan penanganan error. Beberapa diantaranya adalah Optional, Guard dan Throws.
+## Penanganan Error
+Fitur-fitur bahasa Swift menurut saya sengaja dirancang agar kita memikirkan lebih seksama dengan penanganan error. Beberapa diantaranya adalah Optional, Guard, Throws dan Result.
 
 ### Optional
 Secara implisit seluruh objek yang kita buat dalam Objective-C adalah Optionals. Karena objek selain punya nilai, tapi bisa juga tidak (atau nil).
@@ -19,6 +19,7 @@ Secara implisit seluruh objek yang kita buat dalam Objective-C adalah Optionals.
 Lihat cuplikan kelas `Artist` yang saya tulis untuk Objective-C;
 
 ```objc
+// Artist.h
 @interface Artist : NSObject
 @property (nonatomic, strong) NSNumber *artistID;
 @property (nonatomic, strong) NSString *name;
@@ -31,13 +32,16 @@ Tidak jelas terlihat dari ketiga properti, mana yang harus dipunyai seorang arti
 Sekarang kita lihat kelas sama yang ditulis dengan Swift;
 
 ```swift
+// Artist.swift
 class Artist {
   var id: String
   var name: String
   var onTourDate: NSDate?
 }
 ```
-Dalam cuplikan kode di atas, Swift akan menjamin bahwa properti `id` dan `name` akan selalu ada di sebuah objek `Artist`. Satu-satunya properti yang mungkin tidak dipunyai seorang `Artist` adalah `onTourDate`, karena mungkin saja artis tersebut sedang membuat album dan mengurangi jadwal turnya. Dengan Optional, compiler dapat ikut membantu developer dalam memodelkan sebuah logika.
+Dalam cuplikan kode di atas, Swift akan menjamin bahwa properti `id` dan `name` akan selalu ada di sebuah objek `Artist`. Satu-satunya properti yang mungkin tidak dipunyai seorang `Artist` adalah `onTourDate`. Kita bahkan tidak bisa lagi membuat objek artis tanpa `id` dan `nama`, karena compiler akan selalu mengingatkan kita.
+
+Kalau dipikir-pikir masuk akal toh? Artis kan pasti punya nama, dan juga pasti punya identifikasi dalam sistem. Namun, bisa saja seorang artis tidak punya jadwal tur karena sedang sibuk menggarap album. Dibandingkan Objective-C, Swift dan Optional-nya dapat membantu kita lebih jauh dalam memodelkan dan melogikakan objek di kehidupan nyata.
 
 ### Guard
 Guard adalah fitur baru yang diperkenalkan di Swift 2.0. Saya membiasakan untuk menerapkan 'early exit' (atau kadang disebut bouncer pattern) dalam menangani error. Alasannya adalah karena pola ini mengajak saya untuk memikirkan penganganan error di awal blok kode saya. Selain itu saya menghemat indentasi karena 'happy path' tetap di bagian kiri kode, bukan dalam if statement.
@@ -91,18 +95,15 @@ do {
 }
 ```
 
-## Enum + Generics = Result
+### Enum + Generics = Result
 
-Sayangnya throws tidak cocok dalam sync calls.
-alasan.
-selengkapnya: https://gist.github.com/nicklockwood/21495c2015fd2dda56cf
+Sayangnya throws bukanlah cara penanganan error yang cocok untuk segala situasi. Throws mudah digunakan untuk pekerjaan yang synchronous, tapi sulit diterapkan di pekerjaan asynchronous seperti pengambilan data dari network.
 
-pada functional programming, error handling pada async task biasa menggunakan result. result ini ada di swift karena kombinasi enum and generics pada swift sangatlah _powerful_.
+Throws akan bermasalah bila kita panggil dari dalam closure, karena yang akan menerima 'lemparan'-nya adalah si closure itu sendiri, bukan fungsi yang memanggilnya. Compiler akan mengingatkan kita kalau tipe closure tidak cocok, karena deklarasinya tanpa throws tapi diimplementasinya menggunakan throws. Lebih lengkapnya, Nick Lockwood menulis pemikirannya tentang hal ini di poin #2 pada tulisannya, [Thoughts on Swift 2 Errors](https://gist.github.com/nicklockwood/21495c2015fd2dda56cf).
 
-Ini bukanlah hal baru pada Swift 2.0, kita sudah bisa menggunakan kekuatan enumeration sejak versi pertama dari Swift.
-Dulu enum terbatas sehingga harus pakai box : http://natashatherobot.com/swift-generics-box. Namun swift 2.0 sudah tidak perlu memerlukannya lagi.
+Bahkan kalau kita tilik kembali SDK terakhir dari Apple, method mengembalikan data secara asynchronous tetap mempunyai error sebagai parameternya (sebagai contoh, lihat [`dataTaskWithRequest: completionHandler:`](https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:) ). Bahkan Apple pun belum menggunakan throws untuk method yang asynchronous.
 
-Berikut sintaks result
+Lalu apa alternatif lain yang lebih cocok? Pada functional programming, error handling pada async task biasa menggunakan sebuah tipe khusus, Result. Result ini bisa kita gunakan di swift dengan mengkombinasikan enum and generics. Berikut sintaks dari tipe Result :
 
 ```swift
 enum Result<T, Error: ErrorType> {
@@ -111,9 +112,9 @@ enum Result<T, Error: ErrorType> {
 }
 ```
 
-Mudahnya, result adalah tipe yang punya dua opsi, yaitu sukses yang berisi sebuah tipe (dalam hal ini bisa apa saja), atau error yang berisi tipe error.
+Mudahnya, Result adalah tipe yang punya dua kemungkinan, yaitu sukses atau gagal. Kalau sukses Result berisi sebuah tipe apapun (disimbolkan dengan huruf T), sedangkan kalau gagal Result berisi error.
 
-Sebelum melihat penerapan result pada async call, kita coba lihat kode objective-c yang umum kita gunakan untuk membuat network call. Perhatikan parameter dari completion block-nya.
+Sebelum melihat penerapan result pada pekerjaan yang asynchronous, kita lihat dulu kode Objective-C yang umum kita gunakan saat memanggil data dari jaringan. Perhatikan parameter dari completion block-nya.
 
 ```objc
 // SongkickAPI.h
@@ -130,23 +131,39 @@ Sebelum melihat penerapan result pada async call, kita coba lihat kode objective
    completion:^(NSArray *results, NSError *error) {
       if (error) {
         // penanganan error
+        return
       }
-      // parsing results menjadi daftar artis
+      // penggunaan artis terlacak
   }];
 }
 ```
 
-Penjelasan kenapa parameter results + error jelek dan tidak masuk logika.
+Kita telaah kenapa menggunakan dua parameter untuk completion block kurang baik. Pada kasus di atas, ada 4 kemungkinan yang terjadi; (results, nil), (nil, error), (results, error), (nil, nil). Dari empat, dua diantaranya tidak masuk di akal. Kita bisa saja berikan results dan error yang tidak nil, atau results dan error yang sama-sama nil. Dua kemungkinan ini __valid__ di mata compiler, padahal tidak masuk logika.
 
-Kita lihat pada Swift
+Sekarang kita bandingkan dengan Swift + Result
 
 ```swift
+// SongkickAPI.swift
 class func searchArtist(
   name: String,
   page: Int = 1,
-  completionHandler: (Result<[Artist], ErrorType>) -> Void
+  completionHandler: (Result<[Artist], ErrorType>) -> NSURLSessionDataTask
 )
+
+// SearchViewController.swift
+func buttonClicked() {
+  let task = SongkickAPI.searchArtist("Bad") { result in
+    switch result {
+    case .Success(let artists):
+      // penggunaan artis terlacak
+    case .Failure(let error):
+      // penanganan error
+    }
+  }
+}
+
 ```
+Dengan Result, ini lebih bagus dan lebih masuk diakal. Paramater pada completion handler cukup satu saja. Kemungkinannya hanya dua, sukses berarti yang memberikan daftar artis, atau gagal yang memberikan informasi kegagalan pada error. Untuk kasus ini, saya puas menggunakan Result karena kode mjadi lebih bersih, lebih jelas dan lebih benar.
 
 ## Akses Privat untuk Unit Test
 
@@ -157,7 +174,7 @@ Seringkali kita mengekspos kelas atau method kita yang sebenarnya private menjad
 import XCTest
 @testable  // nama modul kita
 
-// tes dapat akses pada kelas dan method privat!
+// tes dapat akses pada kelas dan method privat
 ```
 
 Panduan lebih mudahnya bisa dilihat di blognya [Natasha](http://natashatherobot.com/swift-2-xcode-7-unit-testing-access).
@@ -185,9 +202,9 @@ Menggunakan Swift memang membuat kode menjadi lebih ramping. Sintaks Swift terli
 
 Compiler Swift juga pintar dalam menyimpulkan tipe data. Sehingga kita tidak perlu menulis secara gamblang semua tipe variabel atau fungsi seperti yang kita lakukan di Objective-C.
 
-Terakhir, saya menggunakan "`class extension`" pada kelas-kelas berbeda sehingga saya bisa memisahkan tanggung jawab dari satu kelas ke beberapa file terpisah.
+Terakhir, saya menggunakan `extension` pada kelas-kelas berbeda sehingga saya bisa memisahkan tanggung jawab dari satu kelas ke beberapa file terpisah.
 
-## Limitation
+## Kelemahan
 
 UI testing masih suka crash dan rusak2, terutama kalau klik2 dengan cepat
 
@@ -198,6 +215,10 @@ Tooling masih suka crash, walau sudah jauh lebih baik dari sebelumnya. yang saya
 Ini adalah waktu yang exciting untuk menjadi Swift developer. kenapa?
 
 Fitur-fitur bahasa ini masih akan terus berubah dan berkembang.
+
+Kalau ingin mengecek silahkan lihat-lihat repositorynya, On Tour.
+
+Makasih ya sudah membaca!
 
 
 [^1]: Saya sedikit curang karena saya menggunakan library pemilahan JSON, [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON), yang tidak saya masukkan dalam perhitungan baris. Pemilahan data JSON yang sederhana sekalipun masih ribet dan memang masih menjadi topik hangat di komunitas Swift.
