@@ -188,12 +188,12 @@ Untuk menghitung jumlah baris kode, kita bisa menggunakan perintah `find` dari t
 $ find . \( -iname \*.m -o -iname \*.h -o -iname \*.swift \) -exec wc -l '{}' \+
 ```
 
-Kode Objective-C
+__Kode Objective-C__
 
 * total +-1370 baris
 * dua file yang melebihi 200 baris, yaitu sebuah kelas `ViewController` dan kelas Networking untuk API.
 
-Kode Swift [^1]
+__Kode Swift__ [^1]
 
 * total +-980 baris
 * maksimal jumlah baris untuk sebuah file : 145 baris untuk sebuah kelas `ViewController`
@@ -206,17 +206,15 @@ Terakhir, saya menggunakan `extension` pada kelas-kelas berbeda sehingga saya bi
 
 ## Kelemahan
 
-UI testing masih suka crash dan rusak2, terutama kalau klik2 dengan cepat
+Saya sempet mencoba menggunakan UI Testing untuk aplikasi ini, namun ternyata performanya tidak sebagus yang terlihat di keynote. UI Testing pada Xcode 7b2 masih mudah crash, terutama bila kita gunakan aplikasi kita secara cepat. Tapi fitur ini sangat menjanjikan dan semoga bisa lebih robust dan stabil ke depannya.
 
-Tooling masih suka crash, walau sudah jauh lebih baik dari sebelumnya. yang saya sayangkan fitur playground yang masih sangat fragile. Saya sering suka membuka playground untuk mengecek kebenaran ide di kepala saya  sebelum digabungkan di aplikasi utama. Namun apa daya karena suka crash akhirnya saya koding langsung di aplikasi utama.
+Begitu juga dengan fitur Playground. Seringkali saya memulai mencoba apa yang ada di kepala Playground terlebih dahulu, bila terbukti berhasil baru saya kopas ke dalam proyek utama. Namun apa daya Playground masih suka crash dan akhirnya saya koding langsung kembali di proyek utama.
 
 ## Penutup
 
-Ini adalah waktu yang exciting untuk menjadi Swift developer. kenapa?
+Ini adalah waktu yang bergairah untuk menjadi Swift developer. Bahasanya jauh lebih modern dan lebih lengkap daripada Objective-C, bisa dilihat dari contoh-contoh di atas yang saya alami. Apalagi fitur-fitur bahasa ini masih akan terus berubah dan berkembang. Jangan lupa, akhir tahun Swift akan jadi open source dan bisa dijalankan di Linux. Saya tidak sabar untuk bisa membuat website dan aplikasi dengan Swift!
 
-Fitur-fitur bahasa ini masih akan terus berubah dan berkembang.
-
-Kalau ingin mengecek silahkan lihat-lihat repositorynya, On Tour.
+Bila tertarik untuk mengecek proyek utuhnya silahkan lihat repositorynya, [On Tour](https://github.com/ikhsan/On-Tour).
 
 Makasih ya sudah membaca!
 
