@@ -5,91 +5,171 @@
   <id>http://codage.ikhsan.me/blog</id>
   <link href="http://codage.ikhsan.me/blog"/>
   <link href="http://codage.ikhsan.me/feed.xml" rel="self"/>
-  <updated>2015-06-09T05:32:00+01:00</updated>
+  <updated>2015-06-28T17:18:00+01:00</updated>
   <author>
     <name>Ikhsan Assaat</name>
   </author>
   <entry>
-    <title>Fastlane di Jenkins dan Permasalahannya</title>
-    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html"/>
-    <id>http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html</id>
-    <published>2015-06-09T05:32:00+01:00</published>
-    <updated>2015-06-27T16:19:47+01:00</updated>
+    <title>Kesan Pertama Mengubah Kode dari Objective-C ke Swift</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/porting-mini-project-objc-to-swift.html"/>
+    <id>http://codage.ikhsan.me/blog/id/porting-mini-project-objc-to-swift.html</id>
+    <published>2015-06-28T17:18:00+01:00</published>
+    <updated>2015-07-02T01:08:45+01:00</updated>
     <author>
       <name>Ikhsan Assaat</name>
     </author>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Fastlane&lt;/strong&gt; akan membantu kita dalam mengkonfigurasi jalur &lt;em&gt;deployment&lt;/em&gt; yang kita punya. Ada beberapa keuntungan dalam menggunakan fastlane, apapun Continuous Integration (CI) yang kita gunakan, mau itu Travis di &lt;em&gt;cloud&lt;/em&gt;, Jenkins di mesin CI lokal atau bahkan mesin yang kita gunakan untuk pengembangan.  &lt;a href="https://fastlane.tools"&gt;Fastlane&lt;/a&gt; terdiri dari berbagai kakas untuk berbagai kepentingan pula. Tempat pertama yang perlu kita cek adalah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"&gt;daftar perintah-perintah&lt;/a&gt; yang bisa digunakan.&lt;/p&gt;
+    <content type="html">&lt;p&gt;Setelah melihat beberapa video WWDC dalam 2 minggu terakhir, saya akhirnya mencoba fitur-fitur baru dari xcode 7 dan Swift. Sekedar iseng-iseng, saya menggunakan prototipe aplikasi sederhana yang saya buat tahun lalu untuk coding test dari &lt;a href="https://api.songkick.com"&gt;Songkick&lt;/a&gt;.  Saya namakan &amp;ldquo;&lt;strong&gt;On Tour&lt;/strong&gt;&amp;rdquo;, ide dasar aplikasinya adalah untuk melihat jalur tur band-band kesayangan kita di peta.&lt;/p&gt;
 
-&lt;p&gt;Memulai cukup cepat dan mudah. Fastlane bahkan punya asisten yang akan membantu kita &lt;em&gt;nyetting&lt;/em&gt; di awal.&lt;/p&gt;
-&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
-2
-3&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;sudo&lt;span class="o"&gt;)&lt;/span&gt; gem install fastlane
-&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &amp;lt;folder dasar project&amp;gt;
-&lt;span class="gp"&gt;$ &lt;/span&gt;fastlane init
-&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
-&lt;/div&gt;
+&lt;p&gt;&lt;img alt="On Tour" src="/blog/2015-06-28-porting-mini-project-objc-to-swift/ontour.gif" /&gt;&lt;/p&gt;
 
-&lt;p&gt;Dan kita sudah siap! 👌&lt;/p&gt;
+&lt;p&gt;Berikut adalah beberapa catatan dan kesan saya saat mencoba menulis ulang basis kode dari Objective-C ke Swift 2.0.&lt;/p&gt;
 
-&lt;h2&gt;Keuntungan dibanding Jenkins Biasa&lt;/h2&gt;
+&lt;h2&gt;Penanganan Error&lt;/h2&gt;
 
-&lt;h3&gt;Bisa Digunakan di manapun&lt;/h3&gt;
+&lt;p&gt;Fitur-fitur bahasa Swift menurut saya sengaja dirancang agar kita memikirkan lebih seksama dengan penanganan error. Beberapa diantaranya adalah Optional, Guard, Throws dan Result.&lt;/p&gt;
 
-&lt;p&gt;Fastlane dapat dijalankan di semua mesin yang terinstall ruby dan gem yang bersangkutan. Permulaan saya menggunakan Fastlane adalah saat kami di tempat kerja sedang pindah kantor, sehingga tidak punya akses ke server Jenkins. Namun, klien tetap ingin selalu terupdate dengan build terbaru. Dengan menggunakan Fastlane beserta file konfigurasinya, semua developer bisa membuat build yang sama tanpa perlu akses ke Jenkins.&lt;/p&gt;
+&lt;h3&gt;Optional&lt;/h3&gt;
 
-&lt;h3&gt;Konfigurasi Tersimpan dalam Repositori&lt;/h3&gt;
+&lt;p&gt;Secara implisit seluruh objek yang kita buat dalam Objective-C adalah Optionals. Karena objek selain punya nilai, tapi bisa juga tidak (atau nil).&lt;/p&gt;
 
-&lt;p&gt;File konfigurasi (yang bernama &lt;code&gt;Fastfile&lt;/code&gt;) hanya berupa file teks biasa, jadi kita bisa dengan mudah menyimpannya dalam repositori. Kita bahkan tidak perlu lancar berbahasa Ruby karena sintaksnya yang mirip dengan bahasa Inggris biasa.&lt;/p&gt;
-
-&lt;h3&gt;Integrasi dengan Jenkins (yang Seharusnya Mudah)&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href="https://twitter.com/ashfurrow"&gt;Ash Furrow&lt;/a&gt; menulis &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md"&gt;panduan singkat&lt;/a&gt; dalam mengintegrasikan Fastlane ke dalam Jenkins. Kalau Jenkins dan Fastlane sudah terinstall, kita tinggal membuat job baru yang punya dua pekerjaan, mengambil kode sumber dari repositori (dengan plugin git atau SVN) dan mengeksekusi skrip perintah Fastlane (&lt;code&gt;fastlane &amp;lt;nama jalur&amp;gt;&lt;/code&gt;).&lt;/p&gt;
-
-&lt;h2&gt;Problem with Jenkins&lt;/h2&gt;
-
-&lt;p&gt;Integrasi dengan Jenkins semestinya mudah, namun saya menemukan beberapa masalah berdasarkan pengalaman saya.&lt;/p&gt;
-
-&lt;h3&gt;Jenkins Menggunakan Ruby dengan Versi yang Berbeda&lt;/h3&gt;
-
-&lt;p&gt;Pertama kali menjalankan &lt;em&gt;job&lt;/em&gt; di Jenkins, ia komplen karena tidak bisa mendeteksi perintah &lt;code&gt;Fastlane&lt;/code&gt;. Setelah dicek kembali dengan ssh, tampaknya semua telah terinstall dan baik-baik saja. Ternyata &lt;a href="http://stackoverflow.com/a/10519349/851515"&gt;solusinya cukup mudah&lt;/a&gt;, tinggal menggunakan &lt;em&gt;flag&lt;/em&gt; &lt;code&gt;-l&lt;/code&gt; agar menggunakan shell yang sama saat login.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&amp;lsquo;Execute shell&amp;rsquo; di Jenkins&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+&lt;p&gt;Lihat cuplikan kelas &lt;code&gt;Artist&lt;/code&gt; yang saya tulis untuk Objective-C;&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
 2
 3
-4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -l&lt;/span&gt;
-
-&lt;span class="c"&gt;# Saya sudah mengkofigurasi jalur bernama 'build' di `Fastfile`&lt;/span&gt;
-fastlane build
+4
+5
+6&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Artist.h
+&lt;/span&gt;&lt;span class="k"&gt;@interface&lt;/span&gt; &lt;span class="nc"&gt;Artist&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nc"&gt;NSObject&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSNumber&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;artistID&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSString&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSDate&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;onDateTour&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@end&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
 &lt;/div&gt;
 
-&lt;h3&gt;Keychain yang Terkunci&lt;/h3&gt;
+&lt;p&gt;Tidak jelas terlihat dari ketiga properti, mana yang harus dipunyai seorang artis dan mana yang tidak. Bahkan kita bisa saja membuat sebuah objek artis tanpa properti sama sekali. Ini memaksa kita untuk ekstra hati-hati dalam mengolah sebuah kelas, karena compiler tidak punya pengetahuan terlalu jauh dan seluruh logika akan berada sepenuhnya di tangan developer.&lt;/p&gt;
 
-&lt;p&gt;Saya pernah mendapatkan error terkait code signing, yang menyebutkan bahwa keychain tidak bisa diakses karena terkunci. Solusi untuk masalah ini adalah menggunakan kakas &lt;code&gt;unlock-keychain&lt;/code&gt; dengan password admin Anda.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Execute shell&lt;/strong&gt;&lt;/p&gt;
-&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
-2&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;security -v unlock-keychain -p &lt;span class="s2"&gt;"&amp;lt;password admin&amp;gt;"&lt;/span&gt; &lt;span class="s2"&gt;"/Users/&amp;lt;username&amp;gt;/Library/Keychains/login.keychain"&lt;/span&gt;
-fastlane build
+&lt;p&gt;Sekarang kita lihat kelas sama yang ditulis dengan Swift;&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Artist.swift&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kt"&gt;Artist&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;id&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;onTourDate&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSDate&lt;/span&gt;&lt;span class="p"&gt;?&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
 &lt;/div&gt;
 
-&lt;h3&gt;Error pada Codesigning&lt;/h3&gt;
+&lt;p&gt;Dalam cuplikan kode di atas, Swift akan menjamin bahwa properti &lt;code&gt;id&lt;/code&gt; dan &lt;code&gt;name&lt;/code&gt; akan selalu ada di sebuah objek &lt;code&gt;Artist&lt;/code&gt;. Satu-satunya properti yang mungkin tidak dipunyai seorang &lt;code&gt;Artist&lt;/code&gt; adalah &lt;code&gt;onTourDate&lt;/code&gt;. Kita bahkan tidak bisa lagi membuat objek artis tanpa &lt;code&gt;id&lt;/code&gt; dan &lt;code&gt;nama&lt;/code&gt;, karena compiler akan selalu mengingatkan kita.&lt;/p&gt;
 
-&lt;p&gt;Ini sebenarnya bukan masalah spesifik untuk Jenkins, tapi kalau Anda bertemu masalah dengan pesan error seperti &lt;a href="http://stackoverflow.com/a/26499526/851515"&gt;ini&lt;/a&gt;: &amp;ldquo;&lt;code&gt;/tmp/QYFSJIvu7W/Payload/XX.app/ResourceRules.plist: cannot read resources&lt;/code&gt;&amp;rdquo;, maka kita perlu menambahkan file &lt;code&gt;&amp;quot;ResourceRules.plist&amp;quot;&lt;/code&gt; ke dalam konfigurasi proyek di Xcode.&lt;/p&gt;
+&lt;p&gt;Kalau dipikir-pikir masuk akal toh? Artis kan pasti punya nama, dan juga pasti punya identifikasi dalam sistem. Namun, bisa saja seorang artis tidak punya jadwal tur karena sedang sibuk menggarap album. Dibandingkan Objective-C, Swift dan Optional-nya dapat membantu kita lebih jauh dalam memodelkan dan melogikakan objek di kehidupan nyata.&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;Klik target dari proyek Xcode &amp;gt; Build Settings &amp;gt; Code Signing Resource Rules Path&lt;/li&gt;
-&lt;li&gt;Tambahkan &lt;code&gt;$(SDKROOT)/ResourceRules.plist&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h3&gt;Guard&lt;/h3&gt;
 
-&lt;h3&gt;Error pada Codesigning (Lagi)&lt;/h3&gt;
+&lt;p&gt;Guard adalah fitur baru yang diperkenalkan di Swift 2.0. Saya membiasakan untuk menerapkan &amp;lsquo;early exit&amp;rsquo; (atau kadang disebut bouncer pattern) dalam menangani error. Alasannya adalah karena pola ini mengajak saya untuk memikirkan penganganan error di awal blok kode saya. Selain itu saya menghemat indentasi karena &amp;#39;happy path&amp;rsquo; tetap di bagian kiri kode, bukan dalam if statement.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// ArtistViewController.swift&lt;/span&gt;
 
-&lt;p&gt;Saya menemukan masalah ini saat menggunakan dua parameter dari perintah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#ipa"&gt;ipa&lt;/a&gt; : &lt;code&gt;&amp;#39;embed&amp;#39;&lt;/code&gt; and &lt;code&gt;&amp;#39;identity&amp;#39;&lt;/code&gt;. Perintah ini menggunakan kakas &lt;code&gt;codesign&lt;/code&gt; didalamnya. Tapi saya menemukan pesan error yang berujar &lt;code&gt;&amp;quot;code failed to satisfy specified code requirement(s)&amp;quot;&lt;/code&gt;. Sedikit googling, saya langsung menemukan sebuah &lt;a href="http://blog.hoachuck.biz/blog/2013/10/29/codesign-useful-info-in-xcode-5-dot-0-1/"&gt;artikel&lt;/a&gt; yang menerangkan bahwa saya mempunyai path &lt;code&gt;codesign_allocate&lt;/code&gt; yang salah.&lt;/p&gt;
+&lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;artist&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Artist&lt;/span&gt;&lt;span class="p"&gt;?&lt;/span&gt;
 
-&lt;p&gt;Solusi dari permasalahan ini adalah dengan menambahkan &lt;code&gt;path&lt;/code&gt; tersebut secara &amp;ldquo;paksa&amp;rdquo;. Kita bisa melakukannya di skrip dalam Jenkins (opsi execute shell) atau menambahkannya di Fastfile kita. Kalau saya tinggal menambahkannya saja di Fastfile;&lt;/p&gt;
-&lt;div class="highlight ruby"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;openArtist&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;guard&lt;/span&gt; &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;artist&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="c1"&gt;// a dipastikan adalah artist yang valid&lt;/span&gt;
+  &lt;span class="nf"&gt;openArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Throws&lt;/h3&gt;
+
+&lt;p&gt;Swift 2.0 juga memperkenalkan penanganan error default, yang berbeda dengan Objective-C. Mungkin programmer Java sudah cukup familiar dengan konsep try/catch, namun di Swift agak sedikit berbeda, do/try/throws/catch. Bahkan di SDK Apple terkini, beberapa method sudah mengadopsi konsep ini.&lt;/p&gt;
+
+&lt;p&gt;Sebagai contoh, lihat bagaimana biasa kita mengubah NSData menjadi NSDictionary di Objective-C&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// header
+&lt;/span&gt;&lt;span class="k"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nf"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSData&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt; &lt;span class="nf"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSJSONReadingOptions&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;opt&lt;/span&gt; &lt;span class="nf"&gt;error&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;error&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// implementation
+&lt;/span&gt;&lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;NSJSONSerialization&lt;/span&gt; &lt;span class="nf"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="nf"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="nf"&gt;error&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="c1"&gt;// penanganan error
+&lt;/span&gt;  &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="c1"&gt;// result dapat digunakan di sini
+&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Sedangkan pada Swift 2.0, memanggil method yang sama menjadi lebih mudah dimengerti dan pengangan error berada pada kode blok yang berbeda.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// header&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="kt"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSData&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;options&lt;/span&gt; &lt;span class="nv"&gt;opt&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSJSONReadingOptions&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;throws&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;AnyObject&lt;/span&gt;
+
+&lt;span class="c1"&gt;// implementation&lt;/span&gt;
+&lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;try&lt;/span&gt; &lt;span class="kt"&gt;NSJSONSerialization&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;AllowFragments&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as!&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;AnyObject&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="c1"&gt;// result dapat digunakan di sini&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;catch&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="c1"&gt;// penanganan error&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Enum + Generics = Result&lt;/h3&gt;
+
+&lt;p&gt;Sayangnya throws bukanlah cara penanganan error yang cocok untuk segala situasi. Throws mudah digunakan untuk pekerjaan yang synchronous, tapi sulit diterapkan di pekerjaan asynchronous seperti pengambilan data dari network.&lt;/p&gt;
+
+&lt;p&gt;Throws akan bermasalah bila kita panggil dari dalam closure, karena yang akan menerima &amp;#39;lemparan&amp;rsquo;-nya adalah si closure itu sendiri, bukan fungsi yang memanggilnya. Compiler akan mengingatkan kita kalau tipe closure tidak cocok, karena deklarasinya tanpa throws tapi diimplementasinya menggunakan throws. Lebih lengkapnya, Nick Lockwood menulis pemikirannya tentang hal ini di poin #2 pada tulisannya, &lt;a href="https://gist.github.com/nicklockwood/21495c2015fd2dda56cf"&gt;Thoughts on Swift 2 Errors&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Bahkan kalau kita tilik kembali SDK terakhir, Apple belum mengadopsi throws untuk method-method asynchronous-nya. Method masih mengoper error sebagai parameternya (lihat &lt;a href="https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:"&gt;&lt;code&gt;dataTaskWithRequest: completionHandler:&lt;/code&gt;&lt;/a&gt; ).&lt;/p&gt;
+
+&lt;p&gt;Lalu apa alternatif lain yang lebih cocok? Pada functional programming, error handling pada async task biasa menggunakan sebuah tipe khusus, Result. Result ini bisa kita gunakan di swift dengan mengkombinasikan enum and generics. Berikut sintaks dari tipe Result :&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="kd"&gt;enum&lt;/span&gt; &lt;span class="kt"&gt;Result&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;ErrorType&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="kt"&gt;Success&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;T&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="kt"&gt;Failure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Mudahnya, Result adalah tipe yang punya dua kemungkinan, yaitu sukses atau gagal. Kalau sukses Result berisi sebuah tipe apapun (disimbolkan dengan huruf T), sedangkan kalau gagal Result berisi error.&lt;/p&gt;
+
+&lt;p&gt;Sebelum melihat penerapan result pada pekerjaan yang asynchronous, kita lihat dulu kode Objective-C yang umum kita gunakan saat memanggil data dari jaringan. Perhatikan parameter dari completion block-nya.&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
 2
 3
 4
@@ -104,23 +184,464 @@ fastlane build
 13
 14
 15
-16&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="n"&gt;platform&lt;/span&gt; &lt;span class="ss"&gt;:ios&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-  &lt;span class="n"&gt;desc&lt;/span&gt; &lt;span class="s2"&gt;"Making a build"&lt;/span&gt;
-  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:build&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+16
+17
+18
+19&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// SongkickAPI.h
+&lt;/span&gt;&lt;span class="k"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NSURLSessionDataTask&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSString&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;name&lt;/span&gt;
+    &lt;span class="nf"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSUInteger&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;page&lt;/span&gt;
+    &lt;span class="nf"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;)(&lt;/span&gt;&lt;span class="n"&gt;NSArray&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;results&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="nv"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-    &lt;span class="c1"&gt;# Pengkoreksian path untuk kakas codesign_allocate&lt;/span&gt;
-    &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'CODESIGN_ALLOCATE'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"&lt;/span&gt;
-
-    &lt;span class="n"&gt;ipa&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-      &lt;span class="ss"&gt;configuration: &lt;/span&gt;&lt;span class="s2"&gt;"Debug"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-      &lt;span class="ss"&gt;scheme: &lt;/span&gt;&lt;span class="s1"&gt;'MyApp'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# skema aplikasi&lt;/span&gt;
-      &lt;span class="ss"&gt;destination: &lt;/span&gt;&lt;span class="s2"&gt;"build"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# direktori tujuan&lt;/span&gt;
-      &lt;span class="ss"&gt;embed: &lt;/span&gt;&lt;span class="s1"&gt;'fastlane/my_distribution_cert.mobileprovision'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-      &lt;span class="ss"&gt;identity: &lt;/span&gt;&lt;span class="s1"&gt;'iPhone Distribution: Ikhsan Assaat'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="c1"&gt;// SearchViewController.m
+&lt;/span&gt;&lt;span class="k"&gt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;searchButtonClicked&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;NSURLSessionDataTask&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;SongkickAPI&lt;/span&gt;
+   &lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s"&gt;@"Bad"&lt;/span&gt;
+   &lt;span class="nf"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+   &lt;span class="nf"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NSArray&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;results&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// penanganan error
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="c1"&gt;// penggunaan artis terlacak
+&lt;/span&gt;  &lt;span class="p"&gt;}];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Kita telaah kenapa menggunakan dua parameter untuk completion block kurang baik. Pada kasus di atas, ada 4 kemungkinan yang terjadi; (results, nil), (nil, error), (results, error), (nil, nil). Dari empat, dua diantaranya tidak masuk di akal. Kita bisa saja berikan results dan error yang tidak nil, atau results dan error yang sama-sama nil. Dua kemungkinan ini &lt;strong&gt;valid&lt;/strong&gt; di mata compiler, padahal tidak masuk logika.&lt;/p&gt;
+
+&lt;p&gt;Sekarang kita bandingkan dengan Swift + Result&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// SongkickAPI.swift&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="nv"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="nv"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Int&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// swift bisa memberikan default value&lt;/span&gt;
+  &lt;span class="nv"&gt;completionHandler&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Result&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;Artist&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="kt"&gt;ErrorType&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;NSURLSessionDataTask&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;// SearchViewController.swift&lt;/span&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;buttonClicked&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;SongkickAPI&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"Bad"&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
+    &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Success&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;artists&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="c1"&gt;// penggunaan artis terlacak&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Failure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;error&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="c1"&gt;// penanganan error&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Dengan Result, ini lebih bagus dan lebih masuk diakal. Parameter pada completion handler cukup satu saja. Kemungkinannya hanya dua, sukses berarti yang memberikan daftar artis, atau gagal yang memberikan informasi kegagalan pada error. Untuk kasus ini, saya puas menggunakan Result karena kode menjadi lebih bersih, lebih jelas dan lebih benar.&lt;/p&gt;
+
+&lt;h2&gt;Akses Privat untuk Unit Test&lt;/h2&gt;
+
+&lt;p&gt;Seringkali kita mengekspos kelas atau method kita yang sebenarnya private menjadi publik hanya untuk bisa di test di unit test kita. Sekarang di Swift 2.0, tidak perlu lagi kita memodifikasi kode hanya untuk supaya bisa dites. Biarkan saja kode kita apa adanya, lalu gunakan &lt;code&gt;@testable&lt;/code&gt; pada unit test kita 🎉.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Tests.swift&lt;/span&gt;
+&lt;span class="kd"&gt;import&lt;/span&gt; &lt;span class="kt"&gt;XCTest&lt;/span&gt;
+&lt;span class="err"&gt;@testable&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;nama&lt;/span&gt; &lt;span class="n"&gt;modul&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// tes dapat akses pada kelas dan method privat&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Panduan lebih mudahnya bisa dilihat di blognya &lt;a href="http://natashatherobot.com/swift-2-xcode-7-unit-testing-access"&gt;Natasha&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Jumlah Baris pada Kode&lt;/h2&gt;
+
+&lt;p&gt;Jumlah baris kode bukanlah metrik penentu kualitas sebuah kode, namun untuk mencari metrik yang sederhana maka akan tetap saya gunakan. Menulis kode Swift harus lebih terinci karena sifatnya &lt;em&gt;type safety&lt;/em&gt;, walau begitu jumlah baris kodenya lebih sedikit dibanding Objective-C.&lt;/p&gt;
+
+&lt;p&gt;Untuk menghitung jumlah baris kode, kita bisa menggunakan perintah &lt;code&gt;find&lt;/code&gt; dari terminal:&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;find . &lt;span class="se"&gt;\(&lt;/span&gt; -iname &lt;span class="se"&gt;\*&lt;/span&gt;.m -o -iname &lt;span class="se"&gt;\*&lt;/span&gt;.h -o -iname &lt;span class="se"&gt;\*&lt;/span&gt;.swift &lt;span class="se"&gt;\)&lt;/span&gt; -exec wc -l &lt;span class="s1"&gt;'{}'&lt;/span&gt; &lt;span class="se"&gt;\+&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Kode Objective-C&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;+-1370 baris&lt;/li&gt;
+&lt;li&gt;dua file (&lt;code&gt;ViewController&lt;/code&gt; dan kelas Networking) melebihi 200 baris&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Kode Swift&lt;/strong&gt; &lt;sup id="fnref1"&gt;&lt;a href="#fn1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;+-980 baris&lt;/li&gt;
+&lt;li&gt;kelas dengan baris terbanyak adalah sebuah kelas &lt;code&gt;ViewController&lt;/code&gt; dengan 145 baris&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Menggunakan Swift memang membuat kode menjadi lebih ramping. Sintaks Swift terlihat lebih sederhana dan lebih nyaman dilihat. Tidak ada detil rumit yang tidak perlu, seperti bintang untuk &lt;em&gt;pointer&lt;/em&gt;, dua bintang untuk passing &lt;code&gt;NSError&lt;/code&gt; dan titik koma pada akhir baris.&lt;/p&gt;
+
+&lt;p&gt;Compiler Swift juga pintar dalam menyimpulkan tipe data. Sehingga kita tidak perlu menulis secara gamblang semua tipe variabel atau fungsi seperti yang kita lakukan di Objective-C.&lt;/p&gt;
+
+&lt;h2&gt;Kelemahan&lt;/h2&gt;
+
+&lt;p&gt;Saya sempet mencoba menggunakan UI Testing untuk aplikasi ini, namun ternyata performanya tidak sebagus yang terlihat di keynote. UI Testing pada Xcode 7b2 masih mudah crash, terutama bila kita gunakan aplikasi kita secara cepat. Tapi fitur ini sangat menjanjikan dan semoga bisa lebih robust dan stabil ke depannya.&lt;/p&gt;
+
+&lt;p&gt;Begitu juga dengan fitur Playground. Seringkali saya memulai mencoba apa yang ada di kepala Playground terlebih dahulu, bila terbukti berhasil baru saya kopas ke dalam proyek utama. Namun apa daya Playground masih suka crash dan akhirnya saya koding langsung kembali di proyek utama.&lt;/p&gt;
+
+&lt;h2&gt;Penutup&lt;/h2&gt;
+
+&lt;p&gt;Ini adalah waktu yang bergairah untuk menjadi Swift developer. Bahasanya jauh lebih modern dan lebih lengkap daripada Objective-C, bisa dilihat dari contoh-contoh di atas yang saya alami. Apalagi fitur-fitur bahasa ini masih akan terus berubah dan berkembang. Jangan lupa, akhir tahun Swift akan jadi open source dan bisa dijalankan di Linux. Saya tidak sabar untuk bisa membuat website dan aplikasi dengan Swift!&lt;/p&gt;
+
+&lt;p&gt;Bila tertarik untuk mengecek proyek utuhnya silahkan lihat repositorynya, &lt;a href="https://github.com/ikhsan/On-Tour"&gt;On Tour&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Makasih ya sudah membaca!&lt;/p&gt;
+
+&lt;div class="footnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+
+&lt;li id="fn1"&gt;
+&lt;p&gt;Saya sedikit curang karena saya menggunakan library pemilahan JSON, &lt;a href="https://github.com/SwiftyJSON/SwiftyJSON"&gt;SwiftyJSON&lt;/a&gt;, yang tidak saya masukkan dalam perhitungan baris. Pemilahan data JSON yang sederhana sekalipun masih ribet dan memang masih menjadi topik hangat di komunitas Swift.&amp;nbsp;&lt;a href="#fnref1" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>First Impressions on Porting Objective-C Code to Swift</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/en/porting-mini-project-objc-to-swift.html"/>
+    <id>http://codage.ikhsan.me/blog/en/porting-mini-project-objc-to-swift.html</id>
+    <published>2015-06-28T17:17:00+01:00</published>
+    <updated>2015-07-02T03:12:12+01:00</updated>
+    <author>
+      <name>Ikhsan Assaat</name>
+    </author>
+    <content type="html">&lt;p&gt;After seeing WWDC videos in the past 2 weeks, I felt it&amp;rsquo;s time to dive in trying to learn and use the new shiny features on Xcode 7 and Swift 2.0. I tried to port a year-old prototype of a simple app which I made for &lt;a href="https://songkick.com"&gt;Songkick&lt;/a&gt;&amp;rsquo;s coding test.  I called it &lt;strong&gt;On Tour&lt;/strong&gt;, the main idea is to stalk your favorite bands by seeing their tour routes in the map.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="On Tour" src="/blog/2015-06-28-porting-mini-project-objc-to-swift/ontour.gif" /&gt;&lt;/p&gt;
+
+&lt;p&gt;I have put several notes and impression regarding my experience porting the Objective-C code base to Swift.&lt;/p&gt;
+
+&lt;h2&gt;Error Handling&lt;/h2&gt;
+
+&lt;p&gt;Several new features in Swift are designed to better us on handling error cases. Few features that we will review are, Optionals, Guard, Throws and Result Type.&lt;/p&gt;
+
+&lt;h3&gt;Optional&lt;/h3&gt;
+
+&lt;p&gt;Implicitly, all Objective-C objetcs are optionals all along. Because pointer to object either pointing to an instance, but it could also be nil.&lt;/p&gt;
+
+&lt;p&gt;This is a snippet of &lt;code&gt;Artist&lt;/code&gt; class which I wrote on Objective-C&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Artist.h
+&lt;/span&gt;&lt;span class="k"&gt;@interface&lt;/span&gt; &lt;span class="nc"&gt;Artist&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nc"&gt;NSObject&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSNumber&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;artistID&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSString&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@property&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nonatomic&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;strong&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;NSDate&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;onDateTour&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;@end&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Just from seeing the headers, it is not clear which properties are required for an instance of the class. Objective-C even allows us to create an &lt;code&gt;Artist&lt;/code&gt; object without bothering setting its properties. Consequently, it forces us to be extra careful on creating and managing classes and instances. All the logics are our responsibility because Objective-C&amp;rsquo;s compiler is not smart enough to help us out.&lt;/p&gt;
+
+&lt;p&gt;Now let&amp;rsquo;s compare the same class in Swift&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Artist.Swift&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kt"&gt;Artist&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;id&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+  &lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;onTourDate&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSDate&lt;/span&gt;&lt;span class="p"&gt;?&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;By looking to the above snippet, Swift will guarantee that an instance of &lt;code&gt;Artist&lt;/code&gt; will always have an &lt;code&gt;id&lt;/code&gt; and a &lt;code&gt;name&lt;/code&gt;. The only optional property of an &lt;code&gt;Artist&lt;/code&gt; is &lt;code&gt;onTourDate&lt;/code&gt;. This rule do makes sense right?. An artist must have a name and unique identifier in the system. But, the artist might not have any tour dates, say because he/she is currently working on an album.&lt;/p&gt;
+
+&lt;p&gt;In this case, we even can&amp;rsquo;t create an &lt;code&gt;Artist&lt;/code&gt;&amp;rsquo;s instance without having an &lt;code&gt;id&lt;/code&gt; and a &lt;code&gt;name&lt;/code&gt;, otherwise the compiler will warn us. And that is a good thing. Compared to Objective-C, Swift and its Optionals helps us even further on modelling real-world objects.&lt;/p&gt;
+
+&lt;h3&gt;Guard&lt;/h3&gt;
+
+&lt;p&gt;Swift 2.0 introduced a new feature called &lt;strong&gt;Guard&lt;/strong&gt;. I use &amp;lsquo;early exit&amp;rsquo; pattern whenever I can (some say it &amp;ldquo;bouncer pattern&amp;rdquo;) for handling errors. I prefer early exit because it advises me to think error cases early on inside my code block. Another reason is indentation, it keeps the happy path in the first level of indentation and avoids pyramids of doom.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// ArtistViewController.swift&lt;/span&gt;
+
+&lt;span class="k"&gt;var&lt;/span&gt; &lt;span class="nv"&gt;artist&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Artist&lt;/span&gt;&lt;span class="p"&gt;?&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;openArtist&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="c1"&gt;// you could also unwrap optional with guard&lt;/span&gt;
+  &lt;span class="n"&gt;guard&lt;/span&gt; &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;artist&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="nf"&gt;openArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Throws&lt;/h3&gt;
+
+&lt;p&gt;Swift 2.0 proposed a default way of error handling, &lt;strong&gt;Throws&lt;/strong&gt;. Java programmers are familiar with exceptions (&lt;code&gt;try/catch&lt;/code&gt;), but Swift has a slightly twist, &lt;code&gt;do/try/catch&lt;/code&gt;. Even in the latest Apple&amp;rsquo;s SDK, methods that might return errors are not using inout parameters anymore (remember &lt;code&gt;NSError **error&lt;/code&gt;?).&lt;/p&gt;
+
+&lt;p&gt;Lets see how we usually do it in Objective-C, with a sample case of converting &lt;code&gt;NSData&lt;/code&gt; to &lt;code&gt;NSDictionary&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// header.h
+&lt;/span&gt;&lt;span class="k"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nf"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSData&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt; &lt;span class="nf"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSJSONReadingOptions&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;opt&lt;/span&gt; &lt;span class="nf"&gt;error&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;error&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// implementation.h
+&lt;/span&gt;&lt;span class="k"&gt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nf"&gt;convertData&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSData&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;id&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;NSJSONSerialization&lt;/span&gt; &lt;span class="nf"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="nf"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="nf"&gt;error&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// handle the error
+&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="c1"&gt;// using the result
+&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Whereas in Swift 2.0, calling the same method is easier in the eye, and we also presented with a different code block to handle the error.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// header.swift&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="kt"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSData&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;options&lt;/span&gt; &lt;span class="nv"&gt;opt&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSJSONReadingOptions&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;throws&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;AnyObject&lt;/span&gt;
+
+&lt;span class="c1"&gt;// implementation.swift&lt;/span&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;convertData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;NSData&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;try&lt;/span&gt; &lt;span class="kt"&gt;NSJSONSerialization&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;JSONObjectWithData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;options&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;AllowFragments&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as!&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;AnyObject&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="c1"&gt;// using the result&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;catch&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// handle the error&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Enum + Generics = Result&lt;/h3&gt;
+
+&lt;p&gt;Unfortunately, throws is not suitable to all situation. Throws is a perfect fit for synchronous tasks, but not so much for asynchronous task, such as network call.&lt;/p&gt;
+
+&lt;p&gt;Throws will be a problem if we call it from inside a closure, because the error is sent to the closure itself not our calling function. The compiler will warn you saying that there&amp;rsquo;s a type mismatch, because the closure&amp;rsquo;s declaration doesn&amp;rsquo;t have throws but in implementation it does. Nick Lockwood had a great writeup on this problem more in depth (look at the second point), &lt;a href="https://gist.github.com/nicklockwood/21495c2015fd2dda56cf"&gt;Thoughts on Swift 2 Errors&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Even Apple has not yet adopting throws for their asynchronous methods. They still pass the error object as a parameter in the completion handler instead using throws (for example see &lt;a href="https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:"&gt;&lt;code&gt;dataTaskWithRequest: completionHandler:&lt;/code&gt;&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;What are the alternatives then? In functional programming, error cases are being handled with a special type, Result type. Thanks to enum and generics, we could combine those and implement Result type in Swift. This is how you declare a Result type :&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="kd"&gt;enum&lt;/span&gt; &lt;span class="kt"&gt;Result&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;T&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;ErrorType&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="kt"&gt;Success&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;T&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="kt"&gt;Failure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;It might not make sense in a glance, but the concept is simple. Result only has two possibilities, success and failure. If success, then we should have a value of any type (symbolised by the letter T), whereas if fail then you would have the error object containing the error information.&lt;/p&gt;
+
+&lt;p&gt;Before we look at the application for asynchronous task, let&amp;rsquo;s step back to this Objective-C code that we all wrote before when doing network calls. Pay attention on the completion block&amp;rsquo;s parameters.&lt;/p&gt;
+&lt;div class="highlight objective_c"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// SongkickAPI.h
+&lt;/span&gt;&lt;span class="k"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NSURLSessionDataTask&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSString&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;name&lt;/span&gt;
+    &lt;span class="nf"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="n"&gt;NSUInteger&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nv"&gt;page&lt;/span&gt;
+    &lt;span class="nf"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;)(&lt;/span&gt;&lt;span class="n"&gt;NSArray&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;results&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="nv"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// SearchViewController.m
+&lt;/span&gt;&lt;span class="k"&gt;-&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;searchButtonClicked&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;NSURLSessionDataTask&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;SongkickAPI&lt;/span&gt;
+   &lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="s"&gt;@"Bad"&lt;/span&gt;
+   &lt;span class="nf"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
+   &lt;span class="nf"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NSArray&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;results&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// penanganan error
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="c1"&gt;// penggunaan artis terlacak
+&lt;/span&gt;  &lt;span class="p"&gt;}];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Lets review why using two parameters in the completion block is an incorrect logic. For this case, there are 4 possibilities; (results, nil), (nil, error), (results, error), (nil, nil). From four there are two cases that does not make any sense. We could pass both valid value for results and error, or pass nil for both results and error. These two cases are valid by compiler&amp;rsquo;s eye, although it&amp;rsquo;s illogical.&lt;/p&gt;
+
+&lt;p&gt;Now lets tackle this in Swift by applying Result&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// SongkickAPI.swift&lt;/span&gt;
+&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="nv"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="nv"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Int&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;// in swift we can declare default value&lt;/span&gt;
+  &lt;span class="nv"&gt;completionHandler&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Result&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;Artist&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="kt"&gt;ErrorType&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;NSURLSessionDataTask&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;// SearchViewController.swift&lt;/span&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nf"&gt;buttonClicked&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;SongkickAPI&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"Bad"&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
+    &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Success&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;artists&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="c1"&gt;// penggunaan artis terlacak&lt;/span&gt;
+    &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Failure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;error&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+      &lt;span class="c1"&gt;// penanganan error&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;With Result, the solution is much better and does make more sense. Now we only have one parameter for our completion handler. We only have two possibilities, either success which yields us the artists, or failure which sends us the error information. I&amp;rsquo;m really pleased with this approach, because it makes the code cleaner, clearer and more correct.&lt;/p&gt;
+
+&lt;h2&gt;Private Access for Unit Tests&lt;/h2&gt;
+
+&lt;p&gt;We all know the hassle of exposing our private classes or methods solely for testing. Yes it&amp;rsquo;s feasible using techniques like overriding, using category or swizzling but I find that pretty hacky and inelegant. In Swift 2.0 we could leave our private methods and classes as is, and use &lt;code&gt;@testable&lt;/code&gt; in our unit tests instead 🎉.&lt;/p&gt;
+&lt;div class="highlight swift"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Tests.swift&lt;/span&gt;
+&lt;span class="kd"&gt;import&lt;/span&gt; &lt;span class="kt"&gt;XCTest&lt;/span&gt;
+&lt;span class="err"&gt;@testable&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+
+&lt;span class="c1"&gt;// here unit tests have access to private stuff&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Check Natasha&amp;rsquo;s step-by-step guide on her &lt;a href="http://natashatherobot.com/swift-2-xcode-7-unit-testing-access"&gt;blogpost&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Lines of Code (LOC)&lt;/h2&gt;
+
+&lt;p&gt;Lets use a simple code metric, lines of code. Although Swift is a type safety language but it doesn&amp;rsquo;t mean that the code is longer and more verbose than Objective-C code.&lt;/p&gt;
+
+&lt;p&gt;To count the code&amp;rsquo;s lines, we can use &lt;code&gt;find&lt;/code&gt; from terminal:&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;find . &lt;span class="se"&gt;\(&lt;/span&gt; -iname &lt;span class="se"&gt;\*&lt;/span&gt;.m -o -iname &lt;span class="se"&gt;\*&lt;/span&gt;.h -o -iname &lt;span class="se"&gt;\*&lt;/span&gt;.swift &lt;span class="se"&gt;\)&lt;/span&gt; -exec wc -l &lt;span class="s1"&gt;'{}'&lt;/span&gt; &lt;span class="se"&gt;\+&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Objective-C Code&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;+-1370 lines&lt;/li&gt;
+&lt;li&gt;two files (a &lt;code&gt;ViewController&lt;/code&gt; and Networking class) exceed 200 lines&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Swift Code&lt;/strong&gt; &lt;sup id="fnref1"&gt;&lt;a href="#fn1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;+-980 lines&lt;/li&gt;
+&lt;li&gt;longest file is a &lt;code&gt;ViewController&lt;/code&gt; class with 145 lines of code&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Using Swift makes our codebase leaner and more compact. Its syntax is simpler and easier in the eye. No more details to make the compiler happy (star sign for &lt;em&gt;pointers&lt;/em&gt;, semicolons, etc). Its compiler are smarter because it could infer data types, so we don&amp;rsquo;t need to declare types in every variables like we do in Objective-C.&lt;/p&gt;
+
+&lt;h2&gt;Drawbacks&lt;/h2&gt;
+
+&lt;p&gt;I tried using UI Testing for this project, but it doesn&amp;rsquo;t perform as I expected. Using it in Xcode 7b2, it&amp;rsquo;s still fragile and prone to crash, especially when you do stress test by doing fast taps. Nevertheless, this feature is really promising and I hope it will be more robust and stable in the near future.&lt;/p&gt;
+
+&lt;p&gt;Although Playground is much more stable, still the SourceKit crash rate is quite high. Sometimes I experiment in Playground first before I put the code inside the main project. Sadly, the crashes popped up quite often, hence I prefer to code directly inside my main app.&lt;/p&gt;
+
+&lt;h2&gt;Conclussion&lt;/h2&gt;
+
+&lt;p&gt;This is an exciting time to be a Swift developer. The language felt more modern and complete than Objective-C, it&amp;rsquo;s proven by the examples I shared above. Even more, Swift will keep changing and evolving with its community. Don&amp;rsquo;t forget that later this year, Swift will be open source and will run on Linux. I can&amp;rsquo;t wait to write sites and apps with Swift!&lt;/p&gt;
+
+&lt;p&gt;Browse the code if you&amp;rsquo;re interested,  &lt;a href="https://github.com/ikhsan/On-Tour"&gt;On Tour&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+
+&lt;div class="footnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+
+&lt;li id="fn1"&gt;
+&lt;p&gt;Bit of cheating here because I use JSON parsing library, &lt;a href="https://github.com/SwiftyJSON/SwiftyJSON"&gt;SwiftyJSON&lt;/a&gt;, which I don&amp;rsquo;t include in the line counting. Even simple JSON parsing is not that straight forward in Swift and still is a hot topic in Swfit community.&amp;nbsp;&lt;a href="#fnref1" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
 &lt;/div&gt;
 </content>
   </entry>
@@ -240,51 +761,118 @@ fastlane build
 </content>
   </entry>
   <entry>
-    <title>Menambahkan Fitur Slather</title>
-    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/extending-slather.html"/>
-    <id>http://codage.ikhsan.me/blog/id/extending-slather.html</id>
-    <published>2015-06-08T00:47:00+01:00</published>
+    <title>Fastlane di Jenkins dan Permasalahannya</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html"/>
+    <id>http://codage.ikhsan.me/blog/id/fastlane-on-jenkins.html</id>
+    <published>2015-06-09T05:32:00+01:00</published>
     <updated>2015-06-27T16:19:47+01:00</updated>
     <author>
       <name>Ikhsan Assaat</name>
     </author>
-    <content type="html">&lt;p&gt;Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam acaranya Cocoapods, &lt;a href="http://blog.cocoapods.org/Test-Jammin/"&gt;Test Jam&lt;/a&gt;. Inti acaranya adalah menambahkan test code ke pods yang sudah ada bersama-sama sebagai satu komunitas. Saat itulah saya mengenal yang namanya &lt;strong&gt;Slather&lt;/strong&gt; untuk pertama kali. &lt;/p&gt;
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fastlane&lt;/strong&gt; akan membantu kita dalam mengkonfigurasi jalur &lt;em&gt;deployment&lt;/em&gt; yang kita punya. Ada beberapa keuntungan dalam menggunakan fastlane, apapun Continuous Integration (CI) yang kita gunakan, mau itu Travis di &lt;em&gt;cloud&lt;/em&gt;, Jenkins di mesin CI lokal atau bahkan mesin yang kita gunakan untuk pengembangan.  &lt;a href="https://fastlane.tools"&gt;Fastlane&lt;/a&gt; terdiri dari berbagai kakas untuk berbagai kepentingan pula. Tempat pertama yang perlu kita cek adalah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md"&gt;daftar perintah-perintah&lt;/a&gt; yang bisa digunakan.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href="https://github.com/venmo/slather"&gt;Slather&lt;/a&gt; adalah ruby gem yang menghasilkan laporan ulasan kode dari Xcode project dan mengintegrasikannya ke CI. Instalasinya cukup mudah, tinggal mengikuti &lt;a href="https://github.com/venmo/slather#installation"&gt;pedoman&lt;/a&gt; yang tersedia.&lt;/p&gt;
-
-&lt;p&gt;Setelah project terpasang dengan servis &lt;em&gt;code coverage&lt;/em&gt; seperti &lt;a href="https://coveralls.io"&gt;coveralls&lt;/a&gt;, kita bisa meninjau hasil &lt;em&gt;coverage&lt;/em&gt; kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/coveralls_1.png" /&gt;&lt;/p&gt;
-
-&lt;h2&gt;Penggunaan secara Lokal : Laporan HTML&lt;/h2&gt;
-
-&lt;p&gt;Seringkali, kita juga ingin mempunyai akses informasi yang sama dengan dasbor Coveralls tanpa harus update kode kita ke remote repository dan mengunjungi situsnya.&lt;/p&gt;
-
-&lt;p&gt;Dengan Slather, kita bisa mendapatkan informasi sederhana dengan &lt;em&gt;simple output mode&lt;/em&gt; menggunakan &lt;code&gt;-s&lt;/code&gt;. Tapi untuk saya, ini tidak memberikan detil yang cukup. Kita hanya mendapatkan persentase untuk tiap file, tapi tanpa informasi &lt;strong&gt;baris mana&lt;/strong&gt; yang ter-&lt;em&gt;cover&lt;/em&gt;. Saya tidak mau selalu update kode saya ke remote repository tiap kali ingin mengecek baris mana yang telah ter-&lt;em&gt;cover&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Saya pikir, kenapa saya tidak tambahkan saja fitur ini ke Slather? Keren kan kalau bisa menghasilkan reports sebagai laman HTML statik. Menggunakan file HTML berarti kita tidak perlu konfigurasi tambahan, aplikasi lain atau bahkan koneksi internet. Hanya perlu browser saja dan bisa langsung pakai.&lt;/p&gt;
-
-&lt;p&gt;Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari &lt;em&gt;pull request&lt;/em&gt; yang telah terintegrasi, kita dapat mempelajari bagaimana orang lain menambahkan fitur ke sebuah project. Saya menggunakan PR-nya &lt;a href="(https://github.com/neonichu)"&gt;neonichu&lt;/a&gt; saat dia menambahkan fitur &lt;a href="https://github.com/venmo/slather/pull/24/files?diff=split"&gt;GutterJSON&lt;/a&gt; sebagai panduan saya. Sedikit tips, adalah gunakan &lt;em&gt;file diffing&lt;/em&gt;-nya Github untuk melihat jelas apa-apa saja yang ditambahkan.&lt;/p&gt;
-
-&lt;p&gt;Saya bukan desainer handal, jadi saya mengikuti saja apa yang sekiranya sudah terbukti. Slather sudah punya logo yang cakep, saya gunakan saja skema warnanya. Lalu saya jiplak plek-plek &lt;em&gt;styling&lt;/em&gt;-nya Coveralls, termasuk desain tabel dan tampilan kodenya. Kredit untuk beberapa &lt;em&gt;library&lt;/em&gt; yang saya gunakan, sorotan pada kode menggunakan &lt;a href="https://highlightjs.org/"&gt;&lt;code&gt;highlight.js&lt;/code&gt;&lt;/a&gt;, pengurutan dan filter menggunakan &lt;a href="http://www.listjs.com/"&gt;list.js&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/slather_html_1.png" /&gt;
-&lt;img alt="Coveralls Line Coverage" src="/blog/2015-06-07-extending-slather/slather_html_2.png" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Untuk membangkitkan laporan html, gunakan opsi &lt;code&gt;--html&lt;/code&gt;. Perintah ini akan menampilkan path dari laman indeks, tapi bisa juga gunakan opsi &lt;code&gt;--show&lt;/code&gt; untuk membuka laporan secara otomatis di perambah.&lt;/p&gt;
-&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;slather coverage --html --show path/to/project.xcodeproj
+&lt;p&gt;Memulai cukup cepat dan mudah. Fastlane bahkan punya asisten yang akan membantu kita &lt;em&gt;nyetting&lt;/em&gt; di awal.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;sudo&lt;span class="o"&gt;)&lt;/span&gt; gem install fastlane
+&lt;span class="gp"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; &amp;lt;folder dasar project&amp;gt;
+&lt;span class="gp"&gt;$ &lt;/span&gt;fastlane init
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
 &lt;/div&gt;
 
-&lt;h2&gt;Kode telah terintegrasi 🎉&lt;/h2&gt;
+&lt;p&gt;Dan kita sudah siap! 👌&lt;/p&gt;
 
-&lt;p&gt;Sejujurnya, ini adalah pengalaman kali pertama dalam kontribusi open source yang terasa nyata. Respons dari lainnya sangat memotivasi dan hasilnya cukup membanggakan. Sangat diharapkan fitur ini akan digunakan banyak orang. Pembangkitan &lt;a href="https://github.com/venmo/slather/pull/76"&gt;laporan HTML code coverage&lt;/a&gt; sudah terintegrasi ke Slather 1.8. Asik dah.&lt;/p&gt;
+&lt;h2&gt;Keuntungan dibanding Jenkins Biasa&lt;/h2&gt;
 
-&lt;h3&gt;Update WWDC15 : Xcode 7 telah memiliki fitur code coverage&lt;/h3&gt;
+&lt;h3&gt;Bisa Digunakan di manapun&lt;/h3&gt;
 
-&lt;p&gt;Saat WWDC15 kemarin, Apple mengumumkan bahwa fitur &lt;em&gt;code coverage&lt;/em&gt; telah tersedia di Xcode. Pemgembang dapat melihat di dalam aplikasi baris kode mana yang sudah ter-&lt;em&gt;cover&lt;/em&gt;. Apakah ini berarti Slather dengan laporan HTML-nya sia-sia?&lt;/p&gt;
+&lt;p&gt;Fastlane dapat dijalankan di semua mesin yang terinstall ruby dan gem yang bersangkutan. Permulaan saya menggunakan Fastlane adalah saat kami di tempat kerja sedang pindah kantor, sehingga tidak punya akses ke server Jenkins. Namun, klien tetap ingin selalu terupdate dengan build terbaru. Dengan menggunakan Fastlane beserta file konfigurasinya, semua developer bisa membuat build yang sama tanpa perlu akses ke Jenkins.&lt;/p&gt;
 
-&lt;p&gt;Pendapat saya laporan HTML tetap mempunyai keunggulannya tersendiri. HTML tidak tertempel pada Xcode, yang artinya laporan tersebut bisa dimacam-macamkan. Bisa digunakan untuk cek secara lokal tanpa internet, bisa diunggah di website, atau bisa juga ditempel di Jenkins. Masih banyak lah kemungkinan-kemungkinan lain yang bisa dieksplor dengan laporan HTML ini, jadi tentu saja masih punya nilainya tersendiri.&lt;/p&gt;
+&lt;h3&gt;Konfigurasi Tersimpan dalam Repositori&lt;/h3&gt;
+
+&lt;p&gt;File konfigurasi (yang bernama &lt;code&gt;Fastfile&lt;/code&gt;) hanya berupa file teks biasa, jadi kita bisa dengan mudah menyimpannya dalam repositori. Kita bahkan tidak perlu lancar berbahasa Ruby karena sintaksnya yang mirip dengan bahasa Inggris biasa.&lt;/p&gt;
+
+&lt;h3&gt;Integrasi dengan Jenkins (yang Seharusnya Mudah)&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href="https://twitter.com/ashfurrow"&gt;Ash Furrow&lt;/a&gt; menulis &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md"&gt;panduan singkat&lt;/a&gt; dalam mengintegrasikan Fastlane ke dalam Jenkins. Kalau Jenkins dan Fastlane sudah terinstall, kita tinggal membuat job baru yang punya dua pekerjaan, mengambil kode sumber dari repositori (dengan plugin git atau SVN) dan mengeksekusi skrip perintah Fastlane (&lt;code&gt;fastlane &amp;lt;nama jalur&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Problem with Jenkins&lt;/h2&gt;
+
+&lt;p&gt;Integrasi dengan Jenkins semestinya mudah, namun saya menemukan beberapa masalah berdasarkan pengalaman saya.&lt;/p&gt;
+
+&lt;h3&gt;Jenkins Menggunakan Ruby dengan Versi yang Berbeda&lt;/h3&gt;
+
+&lt;p&gt;Pertama kali menjalankan &lt;em&gt;job&lt;/em&gt; di Jenkins, ia komplen karena tidak bisa mendeteksi perintah &lt;code&gt;Fastlane&lt;/code&gt;. Setelah dicek kembali dengan ssh, tampaknya semua telah terinstall dan baik-baik saja. Ternyata &lt;a href="http://stackoverflow.com/a/10519349/851515"&gt;solusinya cukup mudah&lt;/a&gt;, tinggal menggunakan &lt;em&gt;flag&lt;/em&gt; &lt;code&gt;-l&lt;/code&gt; agar menggunakan shell yang sama saat login.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&amp;lsquo;Execute shell&amp;rsquo; di Jenkins&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash -l&lt;/span&gt;
+
+&lt;span class="c"&gt;# Saya sudah mengkofigurasi jalur bernama 'build' di `Fastfile`&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Keychain yang Terkunci&lt;/h3&gt;
+
+&lt;p&gt;Saya pernah mendapatkan error terkait code signing, yang menyebutkan bahwa keychain tidak bisa diakses karena terkunci. Solusi untuk masalah ini adalah menggunakan kakas &lt;code&gt;unlock-keychain&lt;/code&gt; dengan password admin Anda.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Execute shell&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;security -v unlock-keychain -p &lt;span class="s2"&gt;"&amp;lt;password admin&amp;gt;"&lt;/span&gt; &lt;span class="s2"&gt;"/Users/&amp;lt;username&amp;gt;/Library/Keychains/login.keychain"&lt;/span&gt;
+fastlane build
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;Error pada Codesigning&lt;/h3&gt;
+
+&lt;p&gt;Ini sebenarnya bukan masalah spesifik untuk Jenkins, tapi kalau Anda bertemu masalah dengan pesan error seperti &lt;a href="http://stackoverflow.com/a/26499526/851515"&gt;ini&lt;/a&gt;: &amp;ldquo;&lt;code&gt;/tmp/QYFSJIvu7W/Payload/XX.app/ResourceRules.plist: cannot read resources&lt;/code&gt;&amp;rdquo;, maka kita perlu menambahkan file &lt;code&gt;&amp;quot;ResourceRules.plist&amp;quot;&lt;/code&gt; ke dalam konfigurasi proyek di Xcode.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Klik target dari proyek Xcode &amp;gt; Build Settings &amp;gt; Code Signing Resource Rules Path&lt;/li&gt;
+&lt;li&gt;Tambahkan &lt;code&gt;$(SDKROOT)/ResourceRules.plist&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Error pada Codesigning (Lagi)&lt;/h3&gt;
+
+&lt;p&gt;Saya menemukan masalah ini saat menggunakan dua parameter dari perintah &lt;a href="https://github.com/KrauseFx/fastlane/blob/master/docs/Actions.md#ipa"&gt;ipa&lt;/a&gt; : &lt;code&gt;&amp;#39;embed&amp;#39;&lt;/code&gt; and &lt;code&gt;&amp;#39;identity&amp;#39;&lt;/code&gt;. Perintah ini menggunakan kakas &lt;code&gt;codesign&lt;/code&gt; didalamnya. Tapi saya menemukan pesan error yang berujar &lt;code&gt;&amp;quot;code failed to satisfy specified code requirement(s)&amp;quot;&lt;/code&gt;. Sedikit googling, saya langsung menemukan sebuah &lt;a href="http://blog.hoachuck.biz/blog/2013/10/29/codesign-useful-info-in-xcode-5-dot-0-1/"&gt;artikel&lt;/a&gt; yang menerangkan bahwa saya mempunyai path &lt;code&gt;codesign_allocate&lt;/code&gt; yang salah.&lt;/p&gt;
+
+&lt;p&gt;Solusi dari permasalahan ini adalah dengan menambahkan &lt;code&gt;path&lt;/code&gt; tersebut secara &amp;ldquo;paksa&amp;rdquo;. Kita bisa melakukannya di skrip dalam Jenkins (opsi execute shell) atau menambahkannya di Fastfile kita. Kalau saya tinggal menambahkannya saja di Fastfile;&lt;/p&gt;
+&lt;div class="highlight ruby"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="n"&gt;platform&lt;/span&gt; &lt;span class="ss"&gt;:ios&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+  &lt;span class="n"&gt;desc&lt;/span&gt; &lt;span class="s2"&gt;"Making a build"&lt;/span&gt;
+  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:build&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Pengkoreksian path untuk kakas codesign_allocate&lt;/span&gt;
+    &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;'CODESIGN_ALLOCATE'&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate"&lt;/span&gt;
+
+    &lt;span class="n"&gt;ipa&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="ss"&gt;configuration: &lt;/span&gt;&lt;span class="s2"&gt;"Debug"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;scheme: &lt;/span&gt;&lt;span class="s1"&gt;'MyApp'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# skema aplikasi&lt;/span&gt;
+      &lt;span class="ss"&gt;destination: &lt;/span&gt;&lt;span class="s2"&gt;"build"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# direktori tujuan&lt;/span&gt;
+      &lt;span class="ss"&gt;embed: &lt;/span&gt;&lt;span class="s1"&gt;'fastlane/my_distribution_cert.mobileprovision'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;identity: &lt;/span&gt;&lt;span class="s1"&gt;'iPhone Distribution: Ikhsan Assaat'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
 </content>
   </entry>
   <entry>
@@ -336,65 +924,51 @@ fastlane build
 </content>
   </entry>
   <entry>
-    <title>Menyalakan Codage</title>
-    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/booting-codeage.html"/>
-    <id>http://codage.ikhsan.me/blog/id/booting-codeage.html</id>
-    <published>2015-06-01T01:00:00+01:00</published>
+    <title>Menambahkan Fitur Slather</title>
+    <link rel="alternate" href="http://codage.ikhsan.me/blog/id/extending-slather.html"/>
+    <id>http://codage.ikhsan.me/blog/id/extending-slather.html</id>
+    <published>2015-06-08T00:47:00+01:00</published>
     <updated>2015-06-27T16:19:47+01:00</updated>
     <author>
       <name>Ikhsan Assaat</name>
     </author>
-    <content type="html">&lt;p&gt;Saya merasakan dorongan untuk memisahkan postingan yang berhubungan dengan tekonologi dari tumblr ke tempat yang lebih pas. Ada dua alasan, penyorotan untuk sintaks dari kode dan lokalisasi bahasa. Saya tahu bisa menggunakan gist untuk menulis kode di tumblr, tapi saya ingin fleksibilitas yang lebih lagi. &lt;/p&gt;
+    <content type="html">&lt;p&gt;Bulan lalu, saya mengunjungi kantor Facebook London untuk berpartisipasi dalam acaranya Cocoapods, &lt;a href="http://blog.cocoapods.org/Test-Jammin/"&gt;Test Jam&lt;/a&gt;. Inti acaranya adalah menambahkan test code ke pods yang sudah ada bersama-sama sebagai satu komunitas. Saat itulah saya mengenal yang namanya &lt;strong&gt;Slather&lt;/strong&gt; untuk pertama kali. &lt;/p&gt;
 
-&lt;p&gt;Setelah meriset beberapa opsi, akhirnya saya memutusakn untuk menggunakan &lt;a href="https://middlemanapp.com/basics/blogging/"&gt;Middleman&lt;/a&gt;. Alasannya;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/venmo/slather"&gt;Slather&lt;/a&gt; adalah ruby gem yang menghasilkan laporan ulasan kode dari Xcode project dan mengintegrasikannya ke CI. Instalasinya cukup mudah, tinggal mengikuti &lt;a href="https://github.com/venmo/slather#installation"&gt;pedoman&lt;/a&gt; yang tersedia.&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;platformnya aktif, dibuat dan dikelola oleh orang-orang jago di &lt;a href="http://thoughtbot.com"&gt;thoughbot&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;berbasis ruby, yang memang ingin saya pelajari lebih lanjut&lt;/li&gt;
-&lt;li&gt;mendukung fitur &lt;a href="https://github.com/middleman/middleman-syntax"&gt;penyorotan kode&lt;/a&gt; dan &lt;a href="https://middlemanapp.com/advanced/localization/"&gt;bahasa lebih dari satu&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;bisa di-&lt;em&gt;deploy&lt;/em&gt; dengan github pages&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Setelah project terpasang dengan servis &lt;em&gt;code coverage&lt;/em&gt; seperti &lt;a href="https://coveralls.io"&gt;coveralls&lt;/a&gt;, kita bisa meninjau hasil &lt;em&gt;coverage&lt;/em&gt; kode melalui laman webnya. Dasbor coveralls memberikan informasi yang dibutuhkan; total persentase, table data dari tiap file dan kode yang bersangkutan.&lt;/p&gt;
 
-&lt;p&gt;Middleman menyediakan &lt;em&gt;template&lt;/em&gt; untuk mempercepat pembuatan blog. Walau dengan &lt;em&gt;template&lt;/em&gt; namun website tetap bisa dikostumisasi lebih lanjut. Takarannya ini yang pas untuk saya, seimbang antara kemudahan dan flesibilitas.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/coveralls_1.png" /&gt;&lt;/p&gt;
 
-&lt;p&gt;Ada &lt;a href="https://robots.thoughtbot.com/middleman-bourbon-walkthrough"&gt;pedoman yang asik&lt;/a&gt; untuk menata blog middleman Anda. Saya sangat menyarankannya jika ingin melakukan penataan lebih lanjut ke situs middleman Anda, bahkan pedoman ini yang saya gunakan untuk menata website ini menyerupai blog utama saya.&lt;/p&gt;
+&lt;h2&gt;Penggunaan secara Lokal : Laporan HTML&lt;/h2&gt;
 
-&lt;p&gt;Untuk info lebih lanjut dengan kakas-kakas middleman, bisa cek &lt;a href="http://bourbon.io/"&gt;Bourbon&lt;/a&gt; (Sass mixin library), &lt;a href="http://neat.bourbon.io/"&gt;Neat&lt;/a&gt; (grid framework) dan &lt;a href="http://bitters.bourbon.io/"&gt;Bitters&lt;/a&gt; (konfigurasi standar untuk Bourbon).&lt;/p&gt;
+&lt;p&gt;Seringkali, kita juga ingin mempunyai akses informasi yang sama dengan dasbor Coveralls tanpa harus update kode kita ke remote repository dan mengunjungi situsnya.&lt;/p&gt;
 
-&lt;h2&gt;Kesimpulan&lt;/h2&gt;
+&lt;p&gt;Dengan Slather, kita bisa mendapatkan informasi sederhana dengan &lt;em&gt;simple output mode&lt;/em&gt; menggunakan &lt;code&gt;-s&lt;/code&gt;. Tapi untuk saya, ini tidak memberikan detil yang cukup. Kita hanya mendapatkan persentase untuk tiap file, tapi tanpa informasi &lt;strong&gt;baris mana&lt;/strong&gt; yang ter-&lt;em&gt;cover&lt;/em&gt;. Saya tidak mau selalu update kode saya ke remote repository tiap kali ingin mengecek baris mana yang telah ter-&lt;em&gt;cover&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;Walaupun banyak yang harus di-&lt;em&gt;setup&lt;/em&gt;, tapi saya puas dengan hasilnya. Ga jelek-jelek amat lah untuk rubyist pemula seperti saya, untuk bisa membuat, menata dan menjalankan website saya. Cek juga &lt;a href="https://github.com/ikhsan/ikhsan.github.io/tree/develop"&gt;kode sumber&lt;/a&gt; dari blog ini kali-kali tertarik.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Booting Codeage</title>
-    <link rel="alternate" href="http://codage.ikhsan.me/blog/en/booting-codeage.html"/>
-    <id>http://codage.ikhsan.me/blog/en/booting-codeage.html</id>
-    <published>2015-06-01T01:00:00+01:00</published>
-    <updated>2015-06-27T16:19:47+01:00</updated>
-    <author>
-      <name>Ikhsan Assaat</name>
-    </author>
-    <content type="html">&lt;p&gt;I feel the urge to detach my tech-related posts from tumblr to a better platform. Two reasons;  code syntax highlighting and localisation. I know you could use workarounds or just use gist for tumblr, but I need more flexibility. &lt;/p&gt;
+&lt;p&gt;Saya pikir, kenapa saya tidak tambahkan saja fitur ini ke Slather? Keren kan kalau bisa menghasilkan reports sebagai laman HTML statik. Menggunakan file HTML berarti kita tidak perlu konfigurasi tambahan, aplikasi lain atau bahkan koneksi internet. Hanya perlu browser saja dan bisa langsung pakai.&lt;/p&gt;
 
-&lt;p&gt;I researched options and decided to go with &lt;a href="https://middlemanapp.com/basics/blogging/"&gt;Middleman&lt;/a&gt;. Several reasons behind my decision;&lt;/p&gt;
+&lt;p&gt;Langkah pertama adalah bagaimana cara menambahkan fitur. Dengan mencari &lt;em&gt;pull request&lt;/em&gt; yang telah terintegrasi, kita dapat mempelajari bagaimana orang lain menambahkan fitur ke sebuah project. Saya menggunakan PR-nya &lt;a href="(https://github.com/neonichu)"&gt;neonichu&lt;/a&gt; saat dia menambahkan fitur &lt;a href="https://github.com/venmo/slather/pull/24/files?diff=split"&gt;GutterJSON&lt;/a&gt; sebagai panduan saya. Sedikit tips, adalah gunakan &lt;em&gt;file diffing&lt;/em&gt;-nya Github untuk melihat jelas apa-apa saja yang ditambahkan.&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;it is an active platform which is created and maintained by great people from &lt;a href="http://thoughtbot.com"&gt;thoughbot&lt;/a&gt;,&lt;/li&gt;
-&lt;li&gt;it is based on ruby which I want to learn more about,&lt;/li&gt;
-&lt;li&gt;supports &lt;a href="https://github.com/middleman/middleman-syntax"&gt;syntax highlighting&lt;/a&gt; and &lt;a href="https://middlemanapp.com/advanced/localization/"&gt;localisation&lt;/a&gt;, and&lt;/li&gt;
-&lt;li&gt;can be deployed using github pages (free hosting ftw)&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Saya bukan desainer handal, jadi saya mengikuti saja apa yang sekiranya sudah terbukti. Slather sudah punya logo yang cakep, saya gunakan saja skema warnanya. Lalu saya jiplak plek-plek &lt;em&gt;styling&lt;/em&gt;-nya Coveralls, termasuk desain tabel dan tampilan kodenya. Kredit untuk beberapa &lt;em&gt;library&lt;/em&gt; yang saya gunakan, sorotan pada kode menggunakan &lt;a href="https://highlightjs.org/"&gt;&lt;code&gt;highlight.js&lt;/code&gt;&lt;/a&gt;, pengurutan dan filter menggunakan &lt;a href="http://www.listjs.com/"&gt;list.js&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Middleman provides templates to kickstart a blog. Even so, it still allows endless customisation if you want to make a full on customised website. This is the sweet spot of balance between easiness and flexibility.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Coveralls Report Table" src="/blog/2015-06-07-extending-slather/slather_html_1.png" /&gt;
+&lt;img alt="Coveralls Line Coverage" src="/blog/2015-06-07-extending-slather/slather_html_2.png" /&gt;&lt;/p&gt;
 
-&lt;p&gt;There is a &lt;a href="https://robots.thoughtbot.com/middleman-bourbon-walkthrough"&gt;great walkthrough&lt;/a&gt; on how to style out your middleman blog. I highly recommend it if you want to work your middleman site, even I used it to mimic the theme of my &lt;a href="http://ikhsan.me"&gt;main blog&lt;/a&gt; into this site.&lt;/p&gt;
+&lt;p&gt;Untuk membangkitkan laporan html, gunakan opsi &lt;code&gt;--html&lt;/code&gt;. Perintah ini akan menampilkan path dari laman indeks, tapi bisa juga gunakan opsi &lt;code&gt;--show&lt;/code&gt; untuk membuka laporan secara otomatis di perambah.&lt;/p&gt;
+&lt;div class="highlight shell"&gt;&lt;table style="border-spacing: 0"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="gutter gl" style="text-align: right"&gt;&lt;pre class="lineno"&gt;1&lt;/pre&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;pre&gt;&lt;span class="gp"&gt;$ &lt;/span&gt;slather coverage --html --show path/to/project.xcodeproj
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
+&lt;/div&gt;
 
-&lt;p&gt;For more info about the tools, check out &lt;a href="http://bourbon.io/"&gt;Bourbon&lt;/a&gt; (Sass mixin library), &lt;a href="http://neat.bourbon.io/"&gt;Neat&lt;/a&gt; (grid framework) and &lt;a href="http://bitters.bourbon.io/"&gt;Bitters&lt;/a&gt; (default settings for Bourbon).&lt;/p&gt;
+&lt;h2&gt;Kode telah terintegrasi 🎉&lt;/h2&gt;
 
-&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Sejujurnya, ini adalah pengalaman kali pertama dalam kontribusi open source yang terasa nyata. Respons dari lainnya sangat memotivasi dan hasilnya cukup membanggakan. Sangat diharapkan fitur ini akan digunakan banyak orang. Pembangkitan &lt;a href="https://github.com/venmo/slather/pull/76"&gt;laporan HTML code coverage&lt;/a&gt; sudah terintegrasi ke Slather 1.8. Asik dah.&lt;/p&gt;
 
-&lt;p&gt;Although there are many things to setup, but I am pleased with the result. It was rewarding experience for a novice rubyist like me to have created, styled and set up my own site. Check the &lt;a href="https://github.com/ikhsan/ikhsan.github.io/tree/develop"&gt;source of this page&lt;/a&gt; if you are interested.&lt;/p&gt;
+&lt;h3&gt;Update WWDC15 : Xcode 7 telah memiliki fitur code coverage&lt;/h3&gt;
+
+&lt;p&gt;Saat WWDC15 kemarin, Apple mengumumkan bahwa fitur &lt;em&gt;code coverage&lt;/em&gt; telah tersedia di Xcode. Pemgembang dapat melihat di dalam aplikasi baris kode mana yang sudah ter-&lt;em&gt;cover&lt;/em&gt;. Apakah ini berarti Slather dengan laporan HTML-nya sia-sia?&lt;/p&gt;
+
+&lt;p&gt;Pendapat saya laporan HTML tetap mempunyai keunggulannya tersendiri. HTML tidak tertempel pada Xcode, yang artinya laporan tersebut bisa dimacam-macamkan. Bisa digunakan untuk cek secara lokal tanpa internet, bisa diunggah di website, atau bisa juga ditempel di Jenkins. Masih banyak lah kemungkinan-kemungkinan lain yang bisa dieksplor dengan laporan HTML ini, jadi tentu saja masih punya nilainya tersendiri.&lt;/p&gt;
 </content>
   </entry>
 </feed>

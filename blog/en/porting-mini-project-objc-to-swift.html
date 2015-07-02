@@ -1,0 +1,400 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Codeage - First Impressions on Porting Objective-C Code to Swift</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
+
+    <link href="/stylesheets/all.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+
+    <div id="main" role="main">
+      
+
+
+<nav>
+  <h1 class="blog-title"><a href="/">Codeage</a></h1>
+  <p class="blog-description">
+    Pardon my ramblings about code and such
+  </p>
+  <div class="blog-lang">
+    <strong>English</strong> / <a href="/blog/id/porting-mini-project-objc-to-swift.html">Bahasa</a>
+  </div>
+</nav>
+
+      <article>
+        <h1>First Impressions on Porting Objective-C Code to Swift</h1>
+        <p>After seeing WWDC videos in the past 2 weeks, I felt it&rsquo;s time to dive in trying to learn and use the new shiny features on Xcode 7 and Swift 2.0. I tried to port a year-old prototype of a simple app which I made for <a href="https://songkick.com">Songkick</a>&rsquo;s coding test.  I called it <strong>On Tour</strong>, the main idea is to stalk your favorite bands by seeing their tour routes in the map.</p>
+
+<p><img alt="On Tour" src="/blog/2015-06-28-porting-mini-project-objc-to-swift/ontour.gif" /></p>
+
+<p>I have put several notes and impression regarding my experience porting the Objective-C code base to Swift.</p>
+
+<h2>Error Handling</h2>
+
+<p>Several new features in Swift are designed to better us on handling error cases. Few features that we will review are, Optionals, Guard, Throws and Result Type.</p>
+
+<h3>Optional</h3>
+
+<p>Implicitly, all Objective-C objetcs are optionals all along. Because pointer to object either pointing to an instance, but it could also be nil.</p>
+
+<p>This is a snippet of <code>Artist</code> class which I wrote on Objective-C</p>
+<div class="highlight objective_c"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="c1">// Artist.h
+</span><span class="k">@interface</span> <span class="nc">Artist</span> <span class="p">:</span> <span class="nc">NSObject</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">NSNumber</span> <span class="o">*</span><span class="n">artistID</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">NSString</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">NSDate</span> <span class="o">*</span><span class="n">onDateTour</span><span class="p">;</span>
+<span class="k">@end</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Just from seeing the headers, it is not clear which properties are required for an instance of the class. Objective-C even allows us to create an <code>Artist</code> object without bothering setting its properties. Consequently, it forces us to be extra careful on creating and managing classes and instances. All the logics are our responsibility because Objective-C&rsquo;s compiler is not smart enough to help us out.</p>
+
+<p>Now let&rsquo;s compare the same class in Swift</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="c1">// Artist.Swift</span>
+<span class="kd">class</span> <span class="kt">Artist</span> <span class="p">{</span>
+  <span class="k">var</span> <span class="nv">id</span><span class="p">:</span> <span class="kt">String</span>
+  <span class="k">var</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span>
+  <span class="k">var</span> <span class="nv">onTourDate</span><span class="p">:</span> <span class="kt">NSDate</span><span class="p">?</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>By looking to the above snippet, Swift will guarantee that an instance of <code>Artist</code> will always have an <code>id</code> and a <code>name</code>. The only optional property of an <code>Artist</code> is <code>onTourDate</code>. This rule do makes sense right?. An artist must have a name and unique identifier in the system. But, the artist might not have any tour dates, say because he/she is currently working on an album.</p>
+
+<p>In this case, we even can&rsquo;t create an <code>Artist</code>&rsquo;s instance without having an <code>id</code> and a <code>name</code>, otherwise the compiler will warn us. And that is a good thing. Compared to Objective-C, Swift and its Optionals helps us even further on modelling real-world objects.</p>
+
+<h3>Guard</h3>
+
+<p>Swift 2.0 introduced a new feature called <strong>Guard</strong>. I use &lsquo;early exit&rsquo; pattern whenever I can (some say it &ldquo;bouncer pattern&rdquo;) for handling errors. I prefer early exit because it advises me to think error cases early on inside my code block. Another reason is indentation, it keeps the happy path in the first level of indentation and avoids pyramids of doom.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre></td><td class="code"><pre><span class="c1">// ArtistViewController.swift</span>
+
+<span class="k">var</span> <span class="nv">artist</span><span class="p">:</span> <span class="kt">Artist</span><span class="p">?</span>
+
+<span class="kd">func</span> <span class="nf">openArtist</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// you could also unwrap optional with guard</span>
+  <span class="n">guard</span> <span class="k">let</span> <span class="nv">a</span> <span class="o">=</span> <span class="n">artist</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span>
+  <span class="p">}</span>
+  <span class="nf">openArtist</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Throws</h3>
+
+<p>Swift 2.0 proposed a default way of error handling, <strong>Throws</strong>. Java programmers are familiar with exceptions (<code>try/catch</code>), but Swift has a slightly twist, <code>do/try/catch</code>. Even in the latest Apple&rsquo;s SDK, methods that might return errors are not using inout parameters anymore (remember <code>NSError **error</code>?).</p>
+
+<p>Lets see how we usually do it in Objective-C, with a sample case of converting <code>NSData</code> to <code>NSDictionary</code></p>
+<div class="highlight objective_c"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre></td><td class="code"><pre><span class="c1">// header.h
+</span><span class="k">+</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="nf">JSONObjectWithData</span><span class="p">:(</span><span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span> <span class="nf">options</span><span class="p">:(</span><span class="n">NSJSONReadingOptions</span><span class="p">)</span><span class="nv">opt</span> <span class="nf">error</span><span class="p">:(</span><span class="n">NSError</span> <span class="o">**</span><span class="p">)</span><span class="nv">error</span><span class="p">;</span>
+
+<span class="c1">// implementation.h
+</span><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">convertData</span><span class="p">:(</span><span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span> <span class="p">{</span>
+  <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+  <span class="n">id</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSJSONSerialization</span> <span class="nf">JSONObjectWithData</span><span class="p">:</span><span class="n">data</span> <span class="nf">options</span><span class="p">:</span><span class="mi">0</span> <span class="nf">error</span><span class="p">:</span><span class="n">error</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// handle the error
+</span>    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// using the result
+</span><span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Whereas in Swift 2.0, calling the same method is easier in the eye, and we also presented with a different code block to handle the error.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="c1">// header.swift</span>
+<span class="kd">class</span> <span class="kd">func</span> <span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">,</span> <span class="n">options</span> <span class="nv">opt</span><span class="p">:</span> <span class="kt">NSJSONReadingOptions</span><span class="p">)</span> <span class="n">throws</span> <span class="o">-&gt;</span> <span class="kt">AnyObject</span>
+
+<span class="c1">// implementation.swift</span>
+<span class="kd">func</span> <span class="nf">convertData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">result</span> <span class="o">=</span> <span class="n">try</span> <span class="kt">NSJSONSerialization</span><span class="o">.</span><span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">AllowFragments</span><span class="p">)</span> <span class="k">as!</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">AnyObject</span><span class="p">]</span>
+    <span class="c1">// using the result</span>
+  <span class="p">}</span> <span class="n">catch</span> <span class="p">{</span>
+    <span class="c1">// handle the error</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Enum + Generics = Result</h3>
+
+<p>Unfortunately, throws is not suitable to all situation. Throws is a perfect fit for synchronous tasks, but not so much for asynchronous task, such as network call.</p>
+
+<p>Throws will be a problem if we call it from inside a closure, because the error is sent to the closure itself not our calling function. The compiler will warn you saying that there&rsquo;s a type mismatch, because the closure&rsquo;s declaration doesn&rsquo;t have throws but in implementation it does. Nick Lockwood had a great writeup on this problem more in depth (look at the second point), <a href="https://gist.github.com/nicklockwood/21495c2015fd2dda56cf">Thoughts on Swift 2 Errors</a>.</p>
+
+<p>Even Apple has not yet adopting throws for their asynchronous methods. They still pass the error object as a parameter in the completion handler instead using throws (for example see <a href="https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:"><code>dataTaskWithRequest: completionHandler:</code></a>).</p>
+
+<p>What are the alternatives then? In functional programming, error cases are being handled with a special type, Result type. Thanks to enum and generics, we could combine those and implement Result type in Swift. This is how you declare a Result type :</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4</pre></td><td class="code"><pre><span class="kd">enum</span> <span class="kt">Result</span><span class="o">&lt;</span><span class="kt">T</span><span class="p">,</span> <span class="kt">Error</span><span class="p">:</span> <span class="kt">ErrorType</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="kt">Success</span><span class="p">(</span><span class="kt">T</span><span class="p">)</span>
+    <span class="k">case</span> <span class="kt">Failure</span><span class="p">(</span><span class="kt">Error</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>It might not make sense in a glance, but the concept is simple. Result only has two possibilities, success and failure. If success, then we should have a value of any type (symbolised by the letter T), whereas if fail then you would have the error object containing the error information.</p>
+
+<p>Before we look at the application for asynchronous task, let&rsquo;s step back to this Objective-C code that we all wrote before when doing network calls. Pay attention on the completion block&rsquo;s parameters.</p>
+<div class="highlight objective_c"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></td><td class="code"><pre><span class="c1">// SongkickAPI.h
+</span><span class="k">+</span> <span class="p">(</span><span class="n">NSURLSessionDataTask</span> <span class="o">*</span><span class="p">)</span><span class="nf">searchArtist</span><span class="p">:(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">name</span>
+    <span class="nf">page</span><span class="p">:(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="nv">page</span>
+    <span class="nf">completion</span><span class="p">:(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="p">)(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">results</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">))</span><span class="nv">completion</span><span class="p">;</span>
+
+<span class="c1">// SearchViewController.m
+</span><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">searchButtonClicked</span> <span class="p">{</span>
+  <span class="n">NSURLSessionDataTask</span> <span class="o">*</span><span class="n">task</span> <span class="o">=</span>
+  <span class="p">[</span><span class="n">SongkickAPI</span>
+   <span class="nf">searchArtist</span><span class="p">:</span><span class="s">@"Bad"</span>
+   <span class="nf">page</span><span class="p">:</span><span class="mi">1</span>
+   <span class="nf">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">results</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// penanganan error
+</span>        <span class="k">return</span>
+      <span class="p">}</span>
+      <span class="c1">// penggunaan artis terlacak
+</span>  <span class="p">}];</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Lets review why using two parameters in the completion block is an incorrect logic. For this case, there are 4 possibilities; (results, nil), (nil, error), (results, error), (nil, nil). From four there are two cases that does not make any sense. We could pass both valid value for results and error, or pass nil for both results and error. These two cases are valid by compiler&rsquo;s eye, although it&rsquo;s illogical.</p>
+
+<p>Now lets tackle this in Swift by applying Result</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></td><td class="code"><pre><span class="c1">// SongkickAPI.swift</span>
+<span class="kd">class</span> <span class="kd">func</span> <span class="nf">searchArtist</span><span class="p">(</span>
+  <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+  <span class="nv">page</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">// in swift we can declare default value</span>
+  <span class="nv">completionHandler</span><span class="p">:</span> <span class="p">(</span><span class="kt">Result</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">Artist</span><span class="p">],</span> <span class="kt">ErrorType</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">NSURLSessionDataTask</span>
+<span class="p">)</span>
+
+<span class="c1">// SearchViewController.swift</span>
+<span class="kd">func</span> <span class="nf">buttonClicked</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">let</span> <span class="nv">task</span> <span class="o">=</span> <span class="kt">SongkickAPI</span><span class="o">.</span><span class="nf">searchArtist</span><span class="p">(</span><span class="s">"Bad"</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
+    <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="kt">Success</span><span class="p">(</span><span class="k">let</span> <span class="nv">artists</span><span class="p">):</span>
+      <span class="c1">// penggunaan artis terlacak</span>
+    <span class="k">case</span> <span class="o">.</span><span class="kt">Failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
+      <span class="c1">// penanganan error</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+</pre></td></tr></tbody></table>
+</div>
+
+<p>With Result, the solution is much better and does make more sense. Now we only have one parameter for our completion handler. We only have two possibilities, either success which yields us the artists, or failure which sends us the error information. I&rsquo;m really pleased with this approach, because it makes the code cleaner, clearer and more correct.</p>
+
+<h2>Private Access for Unit Tests</h2>
+
+<p>We all know the hassle of exposing our private classes or methods solely for testing. Yes it&rsquo;s feasible using techniques like overriding, using category or swizzling but I find that pretty hacky and inelegant. In Swift 2.0 we could leave our private methods and classes as is, and use <code>@testable</code> in our unit tests instead 🎉.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre><span class="c1">// Tests.swift</span>
+<span class="kd">import</span> <span class="kt">XCTest</span>
+<span class="err">@testable</span> <span class="o">&lt;</span><span class="n">module</span> <span class="n">name</span><span class="o">&gt;</span>
+
+<span class="c1">// here unit tests have access to private stuff</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Check Natasha&rsquo;s step-by-step guide on her <a href="http://natashatherobot.com/swift-2-xcode-7-unit-testing-access">blogpost</a>.</p>
+
+<h2>Lines of Code (LOC)</h2>
+
+<p>Lets use a simple code metric, lines of code. Although Swift is a type safety language but it doesn&rsquo;t mean that the code is longer and more verbose than Objective-C code.</p>
+
+<p>To count the code&rsquo;s lines, we can use <code>find</code> from terminal:</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="gp">$ </span>find . <span class="se">\(</span> -iname <span class="se">\*</span>.m -o -iname <span class="se">\*</span>.h -o -iname <span class="se">\*</span>.swift <span class="se">\)</span> -exec wc -l <span class="s1">'{}'</span> <span class="se">\+</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p><strong>Objective-C Code</strong></p>
+
+<ul>
+<li>+-1370 lines</li>
+<li>two files (a <code>ViewController</code> and Networking class) exceed 200 lines</li>
+</ul>
+
+<p><strong>Swift Code</strong> <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup></p>
+
+<ul>
+<li>+-980 lines</li>
+<li>longest file is a <code>ViewController</code> class with 145 lines of code</li>
+</ul>
+
+<p>Using Swift makes our codebase leaner and more compact. Its syntax is simpler and easier in the eye. No more details to make the compiler happy (star sign for <em>pointers</em>, semicolons, etc). Its compiler are smarter because it could infer data types, so we don&rsquo;t need to declare types in every variables like we do in Objective-C.</p>
+
+<h2>Drawbacks</h2>
+
+<p>I tried using UI Testing for this project, but it doesn&rsquo;t perform as I expected. Using it in Xcode 7b2, it&rsquo;s still fragile and prone to crash, especially when you do stress test by doing fast taps. Nevertheless, this feature is really promising and I hope it will be more robust and stable in the near future.</p>
+
+<p>Although Playground is much more stable, still the SourceKit crash rate is quite high. Sometimes I experiment in Playground first before I put the code inside the main project. Sadly, the crashes popped up quite often, hence I prefer to code directly inside my main app.</p>
+
+<h2>Conclussion</h2>
+
+<p>This is an exciting time to be a Swift developer. The language felt more modern and complete than Objective-C, it&rsquo;s proven by the examples I shared above. Even more, Swift will keep changing and evolving with its community. Don&rsquo;t forget that later this year, Swift will be open source and will run on Linux. I can&rsquo;t wait to write sites and apps with Swift!</p>
+
+<p>Browse the code if you&rsquo;re interested,  <a href="https://github.com/ikhsan/On-Tour">On Tour</a>.</p>
+
+<p>Thanks for reading!</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>Bit of cheating here because I use JSON parsing library, <a href="https://github.com/SwiftyJSON/SwiftyJSON">SwiftyJSON</a>, which I don&rsquo;t include in the line counting. Even simple JSON parsing is not that straight forward in Swift and still is a hot topic in Swfit community.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+        <div class="metadata">
+          <div class="date">Jun.28 2015</div>
+          <div class="tag-list">
+    <a class="tag" href="/blog/tags/objective-c.html">objective-c</a>
+    <a class="tag" href="/blog/tags/swift.html">swift</a>
+</div>
+
+        </div>
+      </article>
+
+      
+<div class="article-links">
+  <div class="previous-link">
+    <a href="/blog/en/fastlane-on-jenkins.html">&larr; Fastlane on Jenkins and its Workarounds</a>
+  </div>
+
+  <div class="next-link">
+    &nbsp;
+  </div>
+
+</div>
+
+      <footer>
+  <div class="footer-blog">
+    <p>
+      I'm Ikhsan and this is my blog for my thoughts on codes and the likes. All other stuff are on my main blog, <a href="http://ikhsan.me">Lifeage</a>. Get in touch via Twitter <a href="http://twitter.com/ixnixnixn">@ixnixnixn</a> or email <a href="mailto:ikhsan.assaat@gmail.com">ikhsan.assaat@gmail.com</a>.
+    </p>
+  </div>
+
+  <div class="footer-links">
+  <ul>
+    <li><a href="http://twitter.com/ixnixnixn">Twitter</a></li>
+    <li><a href="http://github.com/ikhsan">Github</a></li>
+    <li><a href="http://ikhsan.me">Lifeage</a></li>
+  </ul>
+
+  <div class="copyright">
+    <p>&copy; Codage 2009–2015</p>
+  </div>
+</div>
+
+
+</footer>
+
+    </div>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-12712252-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>
