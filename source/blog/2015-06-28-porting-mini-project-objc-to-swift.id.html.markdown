@@ -101,7 +101,7 @@ Sayangnya throws bukanlah cara penanganan error yang cocok untuk segala situasi.
 
 Throws akan bermasalah bila kita panggil dari dalam closure, karena yang akan menerima 'lemparan'-nya adalah si closure itu sendiri, bukan fungsi yang memanggilnya. Compiler akan mengingatkan kita kalau tipe closure tidak cocok, karena deklarasinya tanpa throws tapi diimplementasinya menggunakan throws. Lebih lengkapnya, Nick Lockwood menulis pemikirannya tentang hal ini di poin #2 pada tulisannya, [Thoughts on Swift 2 Errors](https://gist.github.com/nicklockwood/21495c2015fd2dda56cf).
 
-Bahkan kalau kita tilik kembali SDK terakhir dari Apple, method mengembalikan data secara asynchronous tetap mempunyai error sebagai parameternya (sebagai contoh, lihat [`dataTaskWithRequest: completionHandler:`](https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:) ). Bahkan Apple pun belum menggunakan throws untuk method yang asynchronous.
+Bahkan kalau kita tilik kembali SDK terakhir, Apple belum mengadopsi throws untuk method-method asynchronous-nya. Method masih mengoper error sebagai parameternya (lihat [`dataTaskWithRequest: completionHandler:`](https://developer.apple.com/library/prerelease/ios/documentation/Foundation/Reference/NSURLSession_class/index.html#//apple_ref/occ/instm/NSURLSession/dataTaskWithRequest:completionHandler:) ).
 
 Lalu apa alternatif lain yang lebih cocok? Pada functional programming, error handling pada async task biasa menggunakan sebuah tipe khusus, Result. Result ini bisa kita gunakan di swift dengan mengkombinasikan enum and generics. Berikut sintaks dari tipe Result :
 
@@ -146,7 +146,7 @@ Sekarang kita bandingkan dengan Swift + Result
 // SongkickAPI.swift
 class func searchArtist(
   name: String,
-  page: Int = 1,
+  page: Int = 1, // swift bisa memberikan default value
   completionHandler: (Result<[Artist], ErrorType>) -> NSURLSessionDataTask
 )
 
@@ -163,16 +163,16 @@ func buttonClicked() {
 }
 
 ```
-Dengan Result, ini lebih bagus dan lebih masuk diakal. Paramater pada completion handler cukup satu saja. Kemungkinannya hanya dua, sukses berarti yang memberikan daftar artis, atau gagal yang memberikan informasi kegagalan pada error. Untuk kasus ini, saya puas menggunakan Result karena kode mjadi lebih bersih, lebih jelas dan lebih benar.
+Dengan Result, ini lebih bagus dan lebih masuk diakal. Parameter pada completion handler cukup satu saja. Kemungkinannya hanya dua, sukses berarti yang memberikan daftar artis, atau gagal yang memberikan informasi kegagalan pada error. Untuk kasus ini, saya puas menggunakan Result karena kode menjadi lebih bersih, lebih jelas dan lebih benar.
 
 ## Akses Privat untuk Unit Test
 
-Seringkali kita mengekspos kelas atau method kita yang sebenarnya private menjadi publik hanya untuk bisa di test di unit test kita. Sekarang di Swift 2.0, tidak perlu lagi kita memodifikasi kode hanya untuk supaya bisa dites. Biarkan saja kode kita apa adanya, lalu gunakan `@testable` pada unit test kita.
+Seringkali kita mengekspos kelas atau method kita yang sebenarnya private menjadi publik hanya untuk bisa di test di unit test kita. Sekarang di Swift 2.0, tidak perlu lagi kita memodifikasi kode hanya untuk supaya bisa dites. Biarkan saja kode kita apa adanya, lalu gunakan `@testable` pada unit test kita 🎉.
 
 ```swift
 // Tests.swift
 import XCTest
-@testable  // nama modul kita
+@testable <nama modul>
 
 // tes dapat akses pada kelas dan method privat
 ```
@@ -190,19 +190,17 @@ $ find . \( -iname \*.m -o -iname \*.h -o -iname \*.swift \) -exec wc -l '{}' \+
 
 __Kode Objective-C__
 
-* total +-1370 baris
-* dua file yang melebihi 200 baris, yaitu sebuah kelas `ViewController` dan kelas Networking untuk API.
+* +-1370 baris
+* dua file (`ViewController` dan kelas Networking) melebihi 200 baris
 
 __Kode Swift__ [^1]
 
-* total +-980 baris
-* maksimal jumlah baris untuk sebuah file : 145 baris untuk sebuah kelas `ViewController`
+* +-980 baris
+* kelas dengan baris terbanyak adalah sebuah kelas `ViewController` dengan 145 baris
 
 Menggunakan Swift memang membuat kode menjadi lebih ramping. Sintaks Swift terlihat lebih sederhana dan lebih nyaman dilihat. Tidak ada detil rumit yang tidak perlu, seperti bintang untuk _pointer_, dua bintang untuk passing `NSError` dan titik koma pada akhir baris.
 
 Compiler Swift juga pintar dalam menyimpulkan tipe data. Sehingga kita tidak perlu menulis secara gamblang semua tipe variabel atau fungsi seperti yang kita lakukan di Objective-C.
-
-Terakhir, saya menggunakan `extension` pada kelas-kelas berbeda sehingga saya bisa memisahkan tanggung jawab dari satu kelas ke beberapa file terpisah.
 
 ## Kelemahan
 
