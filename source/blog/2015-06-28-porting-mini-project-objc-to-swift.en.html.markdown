@@ -134,10 +134,10 @@ Before we look at the application for asynchronous task, let's step back to this
    page:1
    completion:^(NSArray *results, NSError *error) {
       if (error) {
-        // penanganan error
+        // error handling
         return
       }
-      // penggunaan artis terlacak
+      // code to process searched artists
   }];
 }
 ```
@@ -158,9 +158,9 @@ func buttonClicked() {
   let task = SongkickAPI.searchArtist("Bad") { result in
     switch result {
     case .Success(let artists):
-      // penggunaan artis terlacak
+      // code to process searched artists
     case .Failure(let error):
-      // penanganan error
+      // error handling
     }
   }
 }
