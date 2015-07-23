@@ -218,10 +218,10 @@
    <span class="nf">page</span><span class="p">:</span><span class="mi">1</span>
    <span class="nf">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">results</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// penanganan error
+        <span class="c1">// error handling
 </span>        <span class="k">return</span>
       <span class="p">}</span>
-      <span class="c1">// penggunaan artis terlacak
+      <span class="c1">// code to process searched artists
 </span>  <span class="p">}];</span>
 <span class="p">}</span>
 </pre></td></tr></tbody></table>
@@ -260,9 +260,9 @@
   <span class="k">let</span> <span class="nv">task</span> <span class="o">=</span> <span class="kt">SongkickAPI</span><span class="o">.</span><span class="nf">searchArtist</span><span class="p">(</span><span class="s">"Bad"</span><span class="p">)</span> <span class="p">{</span> <span class="n">result</span> <span class="k">in</span>
     <span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
     <span class="k">case</span> <span class="o">.</span><span class="kt">Success</span><span class="p">(</span><span class="k">let</span> <span class="nv">artists</span><span class="p">):</span>
-      <span class="c1">// penggunaan artis terlacak</span>
+      <span class="c1">// code to process searched artists</span>
     <span class="k">case</span> <span class="o">.</span><span class="kt">Failure</span><span class="p">(</span><span class="k">let</span> <span class="nv">error</span><span class="p">):</span>
-      <span class="c1">// penanganan error</span>
+      <span class="c1">// error handling</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>

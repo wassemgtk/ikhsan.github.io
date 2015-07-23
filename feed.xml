@@ -329,7 +329,7 @@
     <link rel="alternate" href="http://codage.ikhsan.me/blog/en/porting-mini-project-objc-to-swift.html"/>
     <id>http://codage.ikhsan.me/blog/en/porting-mini-project-objc-to-swift.html</id>
     <published>2015-06-28T17:17:00+01:00</published>
-    <updated>2015-07-02T03:12:12+01:00</updated>
+    <updated>2015-07-23T04:09:45+01:00</updated>
     <author>
       <name>Ikhsan Assaat</name>
     </author>
@@ -523,10 +523,10 @@
    &lt;span class="nf"&gt;page&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;
    &lt;span class="nf"&gt;completion&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;NSArray&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;results&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;NSError&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
       &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="c1"&gt;// penanganan error
+        &lt;span class="c1"&gt;// error handling
 &lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt;
       &lt;span class="p"&gt;}&lt;/span&gt;
-      &lt;span class="c1"&gt;// penggunaan artis terlacak
+      &lt;span class="c1"&gt;// code to process searched artists
 &lt;/span&gt;  &lt;span class="p"&gt;}];&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;
@@ -565,9 +565,9 @@
   &lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;task&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;SongkickAPI&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;searchArtist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;"Bad"&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt;
     &lt;span class="k"&gt;switch&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Success&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;artists&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-      &lt;span class="c1"&gt;// penggunaan artis terlacak&lt;/span&gt;
+      &lt;span class="c1"&gt;// code to process searched artists&lt;/span&gt;
     &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="kt"&gt;Failure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="nv"&gt;error&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-      &lt;span class="c1"&gt;// penanganan error&lt;/span&gt;
+      &lt;span class="c1"&gt;// error handling&lt;/span&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
   &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
