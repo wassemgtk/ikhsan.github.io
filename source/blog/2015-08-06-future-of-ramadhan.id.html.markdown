@@ -56,6 +56,8 @@ Apalagi banyak feaneweok (apple dna 3rd party yg bisa kita gunakan)
 
 Alangkah kerennya bula kita busa fuanajan scripting. Maka kra tidak perlu lagi pakai xcode hanya u/ mnejalankan aplikasi. Sayangnya skrng masi blm bbisa krn geocodernya tidak halan. <rdar>
 
+link source code : https://github.com/ikhsan/FutureOfRamadhan
+
 Mungkin nanti klo udah jalan bisa saya concert sbg string dan bisa dijalanakn dr command line
 
 Ref:
