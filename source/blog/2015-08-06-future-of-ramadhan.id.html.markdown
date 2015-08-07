@@ -4,22 +4,39 @@ date: 2015-08-06 09:21 UTC
 tags: swift
 ---
 
-Berawal dari pengalaman berpuasa di luar Indonesia, saya mempunyai keingintahuan dengan puasa-puasa di belahan dunia lain.
+Pengalaman berpuasa di Inggris membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu saya membuat visualisasi sederhana untuk menjawab rasa penasaran tersebut. READMORE
 
-READMORE
+Selain itu, ini situasi ini menjadi alasan yang baik untuk kembali berlatih dengan Swift. Mungkin d3 akan menjadi kakas yang paling cocok untuk situasi seperti ini, namun karena ini hanya sekedar iseng ya sekalian saja bermain-main dengan Swift 2.0.
 
-- berawal dari pengalaman berpuasa di uk, saya mempinyai keingi tahuan akan berouasasi kot2 lain di sleiruh  dumia
-- rasa penasaran tsb dapat dijawab dg memvisualisasikannya dr data
+## Koleksi Data
 
-- pikir saya, aha ini bisa menjasiclatian yg baik u/ mnggunakan swift
-- tool yg terpikir pertama pasti d3.js, namun krn ini hanya proeyk iseng2 maka saya pakai swift saja
+### Tanggal Ramadhan
 
-Berikut adalah beberapa snippet yg sekiranya menarik
+Hal pertama yang ingin kita ketahui adalah pada tanggal berapa bulan ramadhan di masa mendatang. Ini bisa dijawab dengan `NSCalendar` karena kelas tersebut mempunyai jenis kalender islam (hijriah). Dengan ini kita bisa mendaftar tanggal-tanggal bulan Ramadhan pada 25 tahun ke depan. Fungsi ini saya tempatkan di ekstensi kelas `NSDate`.
 
-Data collection
+```swift
+// NSDate+RamadhanDays.swift
 
-Kita ingin tahu tanggal2 bulan ramadhan untuk 25 taun ke depan. Krn nscalendar support islamic calender, in cukup mudah. Kita bisa buat sebuah function pada extension nsdat
-<snippet>
+extension NSDate {
+    static func rmdn_ramadhanDaysForHijriYear(year: Int) -> [NSDate] {
+        guard let hijriCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierIslamic) else { return [] }
+
+        let components = NSDateComponents()
+        // Ramadhan adalah bulan ke 9 di tahun Hijriah
+        components.month = 9
+        components.year = year
+
+        // menggunakan flatMap bukan map,
+        // karena dateFromComponents mungkin mengembalikan NSDate atau nil
+        return (1..<30).flatMap { day in
+            components.day = day
+            return hijriCalendar.dateFromComponents(components)
+        }
+    }
+}
+```
+
+---
 
 Location
 Kita ingin agar hisa mendapstkan titik coordinate dr sebuah nama kota. D geocoding, kita bisa memanggil method dr corelicatin dan mendapatkan data dr tempar tersebu sbg objek clplacemark
