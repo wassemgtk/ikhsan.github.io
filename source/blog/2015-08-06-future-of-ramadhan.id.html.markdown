@@ -15,19 +15,16 @@ Selain itu, ini situasi ini menjadi alasan yang baik untuk kembali berlatih deng
 Hal pertama yang ingin kita ketahui adalah pada tanggal berapa bulan ramadhan di masa mendatang. Ini bisa dijawab dengan `NSCalendar` karena kelas tersebut mempunyai jenis kalender islam (hijriah). Dengan ini kita bisa mendaftar tanggal-tanggal bulan Ramadhan pada 25 tahun ke depan. Fungsi ini saya tempatkan di ekstensi kelas `NSDate`.
 
 ```swift
-// NSDate+RamadhanDays.swift
-
 extension NSDate {
     static func rmdn_ramadhanDaysForHijriYear(year: Int) -> [NSDate] {
         guard let hijriCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierIslamic) else { return [] }
 
         let components = NSDateComponents()
-        // Ramadhan adalah bulan ke 9 di tahun Hijriah
-        components.month = 9
+        components.month = 9 // Ramadhan adalah bulan ke 9 di tahun Hijriah
         components.year = year
 
         // menggunakan flatMap bukan map,
-        // karena dateFromComponents mungkin mengembalikan NSDate atau nil
+        // karena dateFromComponents mungkin mengembalikan optional NSDate
         return (1..<30).flatMap { day in
             components.day = day
             return hijriCalendar.dateFromComponents(components)
@@ -36,49 +33,91 @@ extension NSDate {
 }
 ```
 
+### Lokasi
+
+Kita perlu mengetahui titik kordinat sebuah kota hanya dari namanya. Untungnya CoreLocation mempunyai fungai yang mentransformasikan nama kota menjadi sebuah tempat yang terbungkus dalam objek, `CLPlacemark`.
+
+```swift
+CLGeocoder().geocodeAddressString("London") { p, error in
+    guard let placemark = p?.first else {
+        completionHandler([])
+        return
+    }
+
+    placemark // CLPlacemark dengan sebuah tempat di London
+}
+```
+
+### Waktu Solat
+
+Pemikiran pertama untuk mendapatkan jadwal solat adalah dengan memanggil API seperti [MuslimSalat](http://muslimsalat.com/api/) atau [xchanch](http://xhanch.com/xhanch-api-islamic-get-prayer-time/). Namun sebisa mungkin kita ingin meminimalisir ketergantungan program kita dengan aplikasi lain karena jika aplikasi tersebut tidak bisa diakses maka program kita tidak bisa berjalan.
+
+Saya pengguna sebuah aplikasi bernama [Guidance](http://guidanceapp.com). Ternyata penghitung waktu solatnya dibuka sebagai proyek _open source_, yaitu [`BAPrayerTimes`](https://github.com/batoulapps/BAPrayerTimes). Dengan `BAPrayerTimes`, kita bisa menghitung waktu solat tanpa perlu membuat _network call_.
+
+```swift
+
+private func prayerTimesForDate(date: NSDate, placemark: CLPlacemark) -> BAPrayerTimes? {
+    guard let latitude = placemark.location?.coordinate.latitude,
+        let longitude = placemark.location?.coordinate.longitude,
+        let timeZone = placemark.timeZone else {
+            return nil
+    }
+
+    return BAPrayerTimes(
+        date: date,
+        latitude: latitude,
+        longitude: longitude,
+        timeZone: timeZone,
+        method: BAPrayerMethod.MCW,
+        madhab: BAPrayerMadhab.Hanafi
+    )
+}
+
+```
+
+### _Wrap Up_
+
+Setelah mendapatkan informasi yang dibutuhkan, kita bungkus informasi dalam satu hari pada sebuah struct yang bernama, `RamadhanSummary`. Bila tertarik melihat seluruh kode untuk mengkoleksi data bisa lihat pada [`DataCollection.swift`](https://github.com/ikhsan/FutureOfRamadhan/blob/master/FutureRamadhans/DataCollection.swift)
+
 ---
 
-Location
-Kita ingin agar hisa mendapstkan titik coordinate dr sebuah nama kota. D geocoding, kita bisa memanggil method dr corelicatin dan mendapatkan data dr tempar tersebu sbg objek clplacemark
+## Visualisasi Data
 
-<snippet>
+Tidak ada yang spesial dari bagaimana
 
-waktu solat
-Untuk mencari waktu solat, ada beberapa cara untuk mendapatkan ya. Awalmya saya berencana nenggunakan 3rd partyy api untuk inj. Namun ada cara yg lebih mudah tnapa perlu network call, yaitu baprayertimed
- Ini dibuat oleh penciptanya guidance, dg pod 'baprayertime' maka tak perlu repot2 lagi mendapatkan timetable untuk prayer
+senenernya tidak ada yg spesial, saya menggunakan colextionview dan custom drawredt pada cellnya
 
-<snippets>
-
-Dg mengkombonasikan semuanya, kita bisa wrap data tersebut sebagj tamadhan summary
-
-<snippet>
-
-
-Data visualization
-- senenernya tidak ada yg spesial, saya menggunakan colextionview dan custom drawredt pada cellnya
+### Bar Chart
 
 Untuk setiap ramadhan summary, digambarkan sbg sebuah custom cell.
 Bar yg berwarna menunjukan waktu mulai dan selesainha berpuasa, sedangkan warnanya menunjukan durasi berpuasanaya
-
 Dg sedikit brmain dg skala kita bisa menempatkan letak mulai. Dan panjangbar dg akurat
 
-Warna bar
+### Warna
 
-Saving collection as imagw
+warna
 
-Conclussion
+### Menyimpan `UICollectionView` sebagai gambar
 
-Kalau mau, pake swift suh asik2 aja untukvisualisasi
+menyimpan `UICollectionView` sebagai gambar
+
+### Hasil Akhir
+
+Hasil akhir
+
+![Ramadhan around the world](blog/2015-08-06-future-of-ramadhan/ramadhans.png)
+
+## Kesimpulan
+
+Kalau mau, pake swift suh asik2 aja untuk visualisasi
 Apalagi banyak feaneweok (apple dna 3rd party yg bisa kita gunakan)
 
 Alangkah kerennya bula kita busa fuanajan scripting. Maka kra tidak perlu lagi pakai xcode hanya u/ mnejalankan aplikasi. Sayangnya skrng masi blm bbisa krn geocodernya tidak halan. <rdar>
 
 link source code : https://github.com/ikhsan/FutureOfRamadhan
 
-Mungkin nanti klo udah jalan bisa saya concert sbg string dan bisa dijalanakn dr command line
+Mungkin nanti klo udah jalan bisa saya konversi sbg string dan bisa dijalanakn dr command line
 
-Ref:
+### Referensi
 - dat vis @ udacity
 - bapeayertimes
-
-![Ramadhan around the world](blog/2015-08-06-future-of-ramadhan/ramadhans.png)
