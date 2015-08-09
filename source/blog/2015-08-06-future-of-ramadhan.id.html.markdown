@@ -4,20 +4,22 @@ date: 2015-08-06 09:21 UTC
 tags: swift
 ---
 
-Pengalaman berpuasa di Inggris membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu saya membuat visualisasi sederhana untuk menjawab rasa penasaran tersebut. READMORE
+Pengalaman berpuasa di London membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu saya membuat visualisasi sederhana untuk menjawab rasa penasaran tersebut. READMORE
 
-Selain itu, ini situasi ini menjadi alasan yang baik untuk kembali berlatih dengan Swift. Mungkin d3 akan menjadi kakas yang paling cocok untuk situasi seperti ini, namun karena ini hanya sekedar iseng ya sekalian saja bermain-main dengan Swift 2.0.
+Situasi ini juga menjadi alasan yang baik untuk berlatih Swift. Mungkin d3 akan menjadi kakas yang paling cocok untuk visualisasi data, namun karena ini hanya sekedar main-main, ya sekalian saja bermain dengan Swift 2.0.
 
 ## Koleksi Data
 
 ### Tanggal Ramadhan
 
-Hal pertama yang ingin kita ketahui adalah pada tanggal berapa bulan ramadhan di masa mendatang. Ini bisa dijawab dengan `NSCalendar` karena kelas tersebut mempunyai jenis kalender islam (hijriah). Dengan ini kita bisa mendaftar tanggal-tanggal bulan Ramadhan pada 25 tahun ke depan. Fungsi ini saya tempatkan di ekstensi kelas `NSDate`.
+Hal pertama yang ingin kita ketahui adalah kapan saja bulan Ramadhan jatuh di masa mendatang. Ini bisa dijawab dengan `NSCalendar` karena kelas tersebut mempunyai jenis kalender islam (hijriah). Dengan ini kita bisa mendaftar tanggal-tanggal bulan Ramadhan pada 25 tahun ke depan.
 
 ```swift
 extension NSDate {
     static func rmdn_ramadhanDaysForHijriYear(year: Int) -> [NSDate] {
-        guard let hijriCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierIslamic) else { return [] }
+        guard let hijriCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierIslamic) else {
+          return []
+        }
 
         let components = NSDateComponents()
         components.month = 9 // Ramadhan adalah bulan ke 9 di tahun Hijriah
@@ -35,12 +37,11 @@ extension NSDate {
 
 ### Lokasi
 
-Kita perlu mengetahui titik kordinat sebuah kota hanya dari namanya. Untungnya CoreLocation mempunyai fungai yang mentransformasikan nama kota menjadi sebuah tempat yang terbungkus dalam objek, `CLPlacemark`.
+Kita perlu mengetahui titik kordinat sebuah kota hanya dengan namanya. Untungnya `CoreLocation` mempunyai fungsi untuk mentransformasikan nama kota menjadi lokasi yang dibungkus dalam objek `CLPlacemark`.
 
 ```swift
 CLGeocoder().geocodeAddressString("London") { p, error in
     guard let placemark = p?.first else {
-        completionHandler([])
         return
     }
 
@@ -50,13 +51,12 @@ CLGeocoder().geocodeAddressString("London") { p, error in
 
 ### Waktu Solat
 
-Pemikiran pertama untuk mendapatkan jadwal solat adalah dengan memanggil API seperti [MuslimSalat](http://muslimsalat.com/api/) atau [xchanch](http://xhanch.com/xhanch-api-islamic-get-prayer-time/). Namun sebisa mungkin kita ingin meminimalisir ketergantungan program kita dengan aplikasi lain karena jika aplikasi tersebut tidak bisa diakses maka program kita tidak bisa berjalan.
+Pemikiran pertama untuk mendapatkan jadwal solat adalah dengan memanggil API seperti [MuslimSalat](http://muslimsalat.com/api/) atau [xchanch](http://xhanch.com/xhanch-api-islamic-get-prayer-time/). Namun sebisa mungkin kita ingin meminimalisir ketergantungan aplikasi kita dengan aplikasi lain karena jika API tidak bisa diakses maka aplikasi kita tidak bisa jalan.
 
-Saya pengguna sebuah aplikasi bernama [Guidance](http://guidanceapp.com). Ternyata penghitung waktu solatnya dibuka sebagai proyek _open source_, yaitu [`BAPrayerTimes`](https://github.com/batoulapps/BAPrayerTimes). Dengan `BAPrayerTimes`, kita bisa menghitung waktu solat tanpa perlu membuat _network call_.
+Sehari-hari saya menggunakan aplikasi [Guidance](http://guidanceapp.com) untuk mengecek jadwal solat. Ternyata penghitung waktu solatnya dibuka sebagai proyek _open source_, [`BAPrayerTimes`](https://github.com/batoulapps/BAPrayerTimes). Dengan `BAPrayerTimes`, kita bisa menghitung waktu solat tanpa perlu membuat _network call_.
 
 ```swift
-
-private func prayerTimesForDate(date: NSDate, placemark: CLPlacemark) -> BAPrayerTimes? {
+func prayerTimesForDate(date: NSDate, placemark: CLPlacemark) -> BAPrayerTimes? {
     guard let latitude = placemark.location?.coordinate.latitude,
         let longitude = placemark.location?.coordinate.longitude,
         let timeZone = placemark.timeZone else {
@@ -72,52 +72,113 @@ private func prayerTimesForDate(date: NSDate, placemark: CLPlacemark) -> BAPraye
         madhab: BAPrayerMadhab.Hanafi
     )
 }
-
 ```
 
-### _Wrap Up_
+### `RamadhanSummary`
 
-Setelah mendapatkan informasi yang dibutuhkan, kita bungkus informasi dalam satu hari pada sebuah struct yang bernama, `RamadhanSummary`. Bila tertarik melihat seluruh kode untuk mengkoleksi data bisa lihat pada [`DataCollection.swift`](https://github.com/ikhsan/FutureOfRamadhan/blob/master/FutureRamadhans/DataCollection.swift)
-
----
+Setelah mendapatkan informasi yang dibutuhkan, kita bungkus informasi dalam sekali Ramadhan pada sebuah `struct` yang kita namakan [`RamadhanSummary`](https://github.com/ikhsan/FutureOfRamadhan/blob/master/FutureRamadhans/DataCollection.swift#L6).
 
 ## Visualisasi Data
 
-Tidak ada yang spesial dari bagaimana
+Tidak ada yang spesial dalam memvisualisasikan informasi puasa dalam bentuk grafik. Menggambar grafik yang diinginkan cukup dengan menggunakan fitur gambar sederhana dari Core Graphics.
 
-senenernya tidak ada yg spesial, saya menggunakan colextionview dan custom drawredt pada cellnya
+### Bar
 
-### Bar Chart
-
-Untuk setiap ramadhan summary, digambarkan sbg sebuah custom cell.
-Bar yg berwarna menunjukan waktu mulai dan selesainha berpuasa, sedangkan warnanya menunjukan durasi berpuasanaya
-Dg sedikit brmain dg skala kita bisa menempatkan letak mulai. Dan panjangbar dg akurat
+Sebuah `RamadhanSummary` terpetakan sebagai sebuah `UICollectionViewCell` di `UICollectionView`. Panjang sebuah bar berasal dari durasi lamanya berpuasa, sedangkan letak barnya tergantung dari jam mulai dan jam berakhirnya berpuasa. Dengan menggunakan skala yang tepat kita bisa memposisikan bar tersebut ditempat yang tepat. Kita tambahkan _tick_ untuk setiap dua jam untuk mempermudah pembacaan jam.
 
 ### Warna
 
-warna
+Pewarnaan untuk bar juga ditentukan oleh durasi berpuasa yang relatif terhadap bentangan durasi terpendek dan terpanjang dari semua Ramadhan pada sebuah lokasi. Durasi minimal diwarnai hijau (`rgb(46, 204, 113)`) sedangkan durasi maksimal diwarnai warna orange (`rgb(243, 156, 18)`).
+
+Untuk menentukan warna, kita membutuhkan dua parameter yaitu bentang minimal dan maksimal durasi puasa, dan durasi pada tahun yang ingin dicari. Umpama London mendapat Ramadhan terpendek dengan durasi 14 jam dan terpanjang 20 jam, lalu bagaimana kita menentukanwarna untuk durasi Ramadhan yang 18 jam? Hal ini mungkin lebih terbayang jika kita lihat coret-coretan di bawah ini;
+
+```
+durasi 14  |------------[18]--------| 20
+
+red    46  |------------[??]--------| 243
+green  204 |------------[??]--------| 156
+blue   113 |------------{??}--------| 18
+```
+Perhitungan warna ini ditranslasikan menjadi kode Swift sebagai berikut;
+
+```swift
+extension UIColor {
+    class func colorForDuration(duration: Double, range: (min: Double, max: Double)) -> UIColor {
+        let minColor: (Double, Double, Double) = (46, 204, 113)
+        let maxColor: (Double, Double, Double) = (243, 156, 18)
+
+        let r = minColor.0 + ((maxColor.0 - minColor.0) * ((duration - range.min) / (range.max - range.min)))
+        let g = minColor.1 + ((maxColor.1 - minColor.1) * ((duration - range.min) / (range.max - range.min)))
+        let b = minColor.2 + ((maxColor.2 - minColor.2) * ((duration - range.min) / (range.max - range.min)))
+
+        return UIColor(
+            colorLiteralRed: Float(r / 255.0),
+            green: Float(g / 255.0),
+            blue: Float(b / 255.0),
+            alpha: 1.0
+        )
+    }
+}
+
+// perhitungan warna
+let color = UIColor.colorForDuration(18.0, range:(14.0, 20.0)) // rgb(177, 172, 49)
+```
 
 ### Menyimpan `UICollectionView` sebagai gambar
 
-menyimpan `UICollectionView` sebagai gambar
+Setelah seluruh bar telah diposisikan dan diwarnai dengan benar, kita perlu menyimpan seluruh bar sebagai berkas gambar. Kita bisa membuatnya dengan menggunakan `UIGraphicsGetImageFromCurrentImageContext()`. Namun, [kita harus set `frame` `UICollectionView`](http://stackoverflow.com/a/14376719/851515) kita dengan `contentSize`-nya agar seluruh konten dari `UICollectionView` terdeteksi.
 
-### Hasil Akhir
+```swift
+extension UICollectionView {
+    func rmdn_takeSnapshot() -> UIImage {
+        let oldFrame = self.frame
 
-Hasil akhir
+        var frame = self.frame
+        frame.size.height = self.contentSize.height // ubah sebelum snapshot
+        self.frame = frame
+
+        UIGraphicsBeginImageContextWithOptions(self.frame.size, self.opaque, 0)
+        self.layer.renderInContext(UIGraphicsGetCurrentContext())
+        let screenshot = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        self.frame = oldFrame // ubah kembali ke ukuran sebelumnya
+
+        return screenshot
+    }
+}
+```
+Setelah `UICollectionView` menjadi `UIImage`, kita bisa menyimpannya ke dalam direktori dokumen (`DocumentDirectory`). Bila penyimpanan berhasil, fungsi akan mengembalikan sebuah `path` ke berkas gambar tersebut.
+
+```swift
+extension UIImage {
+    func rmdn_saveImageWithName(name: String) -> String {
+        guard let documentPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true).first,
+            let image = UIImagePNGRepresentation(self) else {
+                return ""
+        }
+
+        let filepath = documentPath.stringByAppendingPathComponent("\(name).png")
+        let success = image.writeToFile(filepath, atomically: true)
+        return success ? filepath : ""
+    }
+}
+```
+
+## Hasil Akhir
+
+Berikut visualisasi durasi berpuasa dari kota [London](2015-08-06-future-of-ramadhan/london.png), [Tokyo](2015-08-06-future-of-ramadhan/tokyo.png), [Reykjavik](2015-08-06-future-of-ramadhan/reykjavik.png) dan [Wellington](2015-08-06-future-of-ramadhan/wellington.png).
 
 ![Ramadhan around the world](blog/2015-08-06-future-of-ramadhan/ramadhans.png)
 
 ## Kesimpulan
 
-Kalau mau, pake swift suh asik2 aja untuk visualisasi
-Apalagi banyak feaneweok (apple dna 3rd party yg bisa kita gunakan)
+Cukup asyik menggunakan Swift sebagai kakas visualisasi data karena banyak _framework_ dari Apple maupun 3rd party yang bisa kita gunakan. Fitur bahasa seperti `guard` dan fungsi-fungsi `CollectionType` membuat menulis dan membaca kode menjadi lebih menyenangkan. Untuk mencobanya, bisa lihat di laman [Github](https://github.com/ikhsan/FutureOfRamadhan).
 
-Alangkah kerennya bula kita busa fuanajan scripting. Maka kra tidak perlu lagi pakai xcode hanya u/ mnejalankan aplikasi. Sayangnya skrng masi blm bbisa krn geocodernya tidak halan. <rdar>
+Ke depannya, akan lebih asyik lagi jika aplikasi ini dijalankan sebagai _playground_. Kita tidak perlu lagi Xcode dan simulator hanya untuk menjalankan aplikasinya. Sayangnya, kita belum bisa menggunakan CoreLocation secara sempurna di playground, karena fitur geocoding tidak berjalan dengan sempurna. Jika fitur geocodingnya berfungsi dengan benar, kita juga bisa jalankan kode ini sebuah _script_ sehingga bisa dijalankan dari terminal.
 
-link source code : https://github.com/ikhsan/FutureOfRamadhan
+## Referensi
 
-Mungkin nanti klo udah jalan bisa saya konversi sbg string dan bisa dijalanakn dr command line
-
-### Referensi
-- dat vis @ udacity
-- bapeayertimes
+- [Data Visualization and D3.js Course](https://www.udacity.com/course/data-visualization-and-d3js--ud507) by Udacity
+- [`BAPrayerTimes`](https://github.com/batoulapps/BAPrayerTimes) by Batoul Apps
+- [Guidance for Mac and iOS](http://guidanceapp.com) by Batoul Apps
