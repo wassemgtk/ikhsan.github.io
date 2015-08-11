@@ -1,0 +1,328 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Codeage</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
+
+    <link href="/stylesheets/all.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+
+    <div id="main" role="main">
+      
+
+
+<nav>
+  <h1 class="blog-title"><a href="/">Codeage</a></h1>
+  <p class="blog-description">
+    Pardon my ramblings about code and such
+  </p>
+  <div class="blog-lang">
+    <a href="/">English</a> / <strong>Bahasa</strong>
+  </div>
+</nav>
+
+      <p>Pengalaman berpuasa di London membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu saya membuat visualisasi sederhana untuk menjawab rasa penasaran tersebut. READMORE</p>
+
+<p>Situasi ini juga menjadi alasan yang baik untuk berlatih Swift. Mungkin d3 akan menjadi kakas yang paling cocok untuk visualisasi data, namun karena ini hanya sekedar main-main, ya sekalian saja bermain dengan Swift 2.0.</p>
+
+<h2>Koleksi Data</h2>
+
+<h3>Tanggal Ramadhan</h3>
+
+<p>Hal pertama yang ingin kita ketahui adalah kapan saja bulan Ramadhan jatuh di masa mendatang. Ini bisa dijawab dengan <code>NSCalendar</code> karena kelas tersebut mempunyai jenis kalender islam (hijriah). Dengan ini kita bisa mendaftar tanggal-tanggal bulan Ramadhan pada 25 tahun ke depan.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">NSDate</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="kd">func</span> <span class="nf">rmdn_ramadhanDaysForHijriYear</span><span class="p">(</span><span class="nv">year</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">NSDate</span><span class="p">]</span> <span class="p">{</span>
+        <span class="n">guard</span> <span class="k">let</span> <span class="nv">hijriCalendar</span> <span class="o">=</span> <span class="kt">NSCalendar</span><span class="p">(</span><span class="nv">calendarIdentifier</span><span class="p">:</span> <span class="kt">NSCalendarIdentifierIslamic</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="p">[]</span>
+        <span class="p">}</span>
+
+        <span class="k">let</span> <span class="nv">components</span> <span class="o">=</span> <span class="kt">NSDateComponents</span><span class="p">()</span>
+        <span class="n">components</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="mi">9</span> <span class="c1">// Ramadhan adalah bulan ke 9 di tahun Hijriah</span>
+        <span class="n">components</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">year</span>
+
+        <span class="c1">// menggunakan flatMap bukan map,</span>
+        <span class="c1">// karena dateFromComponents mungkin mengembalikan optional NSDate</span>
+        <span class="nf">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">..&lt;</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="n">day</span> <span class="k">in</span>
+            <span class="n">components</span><span class="o">.</span><span class="n">day</span> <span class="o">=</span> <span class="n">day</span>
+            <span class="k">return</span> <span class="n">hijriCalendar</span><span class="o">.</span><span class="nf">dateFromComponents</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Lokasi</h3>
+
+<p>Kita perlu mengetahui titik kordinat sebuah kota hanya dengan namanya. Untungnya <code>CoreLocation</code> mempunyai fungsi untuk mentransformasikan nama kota menjadi lokasi yang dibungkus dalam objek <code>CLPlacemark</code>.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7</pre></td><td class="code"><pre><span class="kt">CLGeocoder</span><span class="p">()</span><span class="o">.</span><span class="nf">geocodeAddressString</span><span class="p">(</span><span class="s">"London"</span><span class="p">)</span> <span class="p">{</span> <span class="n">p</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span>
+    <span class="n">guard</span> <span class="k">let</span> <span class="nv">placemark</span> <span class="o">=</span> <span class="n">p</span><span class="p">?</span><span class="o">.</span><span class="n">first</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="n">placemark</span> <span class="c1">// CLPlacemark dengan sebuah tempat di London</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Waktu Solat</h3>
+
+<p>Pemikiran pertama untuk mendapatkan jadwal solat adalah dengan memanggil API seperti <a href="http://muslimsalat.com/api/">MuslimSalat</a> atau <a href="http://xhanch.com/xhanch-api-islamic-get-prayer-time/">xchanch</a>. Namun sebisa mungkin kita ingin meminimalisir ketergantungan aplikasi kita dengan aplikasi lain karena jika API tidak bisa diakses maka aplikasi kita tidak bisa jalan.</p>
+
+<p>Sehari-hari saya menggunakan aplikasi <a href="http://guidanceapp.com">Guidance</a> untuk mengecek jadwal solat. Ternyata penghitung waktu solatnya dibuka sebagai proyek <em>open source</em>, <a href="https://github.com/batoulapps/BAPrayerTimes"><code>BAPrayerTimes</code></a>. Dengan <code>BAPrayerTimes</code>, kita bisa menghitung waktu solat tanpa perlu membuat <em>network call</em>.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</pre></td><td class="code"><pre><span class="kd">func</span> <span class="nf">prayerTimesForDate</span><span class="p">(</span><span class="nv">date</span><span class="p">:</span> <span class="kt">NSDate</span><span class="p">,</span> <span class="nv">placemark</span><span class="p">:</span> <span class="kt">CLPlacemark</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">BAPrayerTimes</span><span class="p">?</span> <span class="p">{</span>
+    <span class="n">guard</span> <span class="k">let</span> <span class="nv">latitude</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">location</span><span class="p">?</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+        <span class="k">let</span> <span class="nv">longitude</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">location</span><span class="p">?</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+        <span class="k">let</span> <span class="nv">timeZone</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">timeZone</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">nil</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="kt">BAPrayerTimes</span><span class="p">(</span>
+        <span class="nv">date</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+        <span class="nv">latitude</span><span class="p">:</span> <span class="n">latitude</span><span class="p">,</span>
+        <span class="nv">longitude</span><span class="p">:</span> <span class="n">longitude</span><span class="p">,</span>
+        <span class="nv">timeZone</span><span class="p">:</span> <span class="n">timeZone</span><span class="p">,</span>
+        <span class="nv">method</span><span class="p">:</span> <span class="kt">BAPrayerMethod</span><span class="o">.</span><span class="kt">MCW</span><span class="p">,</span>
+        <span class="nv">madhab</span><span class="p">:</span> <span class="kt">BAPrayerMadhab</span><span class="o">.</span><span class="kt">Hanafi</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3><code>RamadhanSummary</code></h3>
+
+<p>Setelah mendapatkan informasi yang dibutuhkan, kita bungkus informasi dalam sekali Ramadhan pada sebuah <code>struct</code> yang kita namakan <a href="https://github.com/ikhsan/FutureOfRamadhan/blob/master/FutureRamadhans/DataCollection.swift#L6"><code>RamadhanSummary</code></a>.</p>
+
+<h2>Visualisasi Data</h2>
+
+<p>Tidak ada yang spesial dalam memvisualisasikan informasi puasa dalam bentuk grafik. Menggambar grafik yang diinginkan cukup dengan menggunakan fitur gambar sederhana dari Core Graphics.</p>
+
+<h3>Bar</h3>
+
+<p>Sebuah <code>RamadhanSummary</code> terpetakan sebagai sebuah <code>UICollectionViewCell</code> di <code>UICollectionView</code>. Panjang sebuah bar berasal dari durasi lamanya berpuasa, sedangkan letak barnya tergantung dari jam mulai dan jam berakhirnya berpuasa. Dengan menggunakan skala yang tepat kita bisa memposisikan bar tersebut ditempat yang tepat. Kita tambahkan <em>tick</em> untuk setiap dua jam untuk mempermudah pembacaan jam.</p>
+
+<h3>Warna</h3>
+
+<p>Pewarnaan untuk bar juga ditentukan oleh durasi berpuasa yang relatif terhadap bentangan durasi terpendek dan terpanjang dari semua Ramadhan pada sebuah lokasi. Durasi minimal diwarnai hijau (<code>rgb(46, 204, 113)</code>) sedangkan durasi maksimal diwarnai warna orange (<code>rgb(243, 156, 18)</code>).</p>
+
+<p>Untuk menentukan warna, kita membutuhkan dua parameter yaitu bentang minimal dan maksimal durasi puasa, dan durasi pada tahun yang ingin dicari. Umpama London mendapat Ramadhan terpendek dengan durasi 14 jam dan terpanjang 20 jam, lalu bagaimana kita menentukanwarna untuk durasi Ramadhan yang 18 jam? Hal ini mungkin lebih terbayang jika kita lihat coret-coretan di bawah ini;</p>
+<div class="highlight plaintext"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5</pre></td><td class="code"><pre>durasi 14  |------------[18]--------| 20
+
+red    46  |------------[??]--------| 243
+green  204 |------------[??]--------| 156
+blue   113 |------------{??}--------| 18
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Perhitungan warna ini ditranslasikan menjadi kode Swift sebagai berikut;</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">UIColor</span> <span class="p">{</span>
+    <span class="kd">class</span> <span class="kd">func</span> <span class="nf">colorForDuration</span><span class="p">(</span><span class="nv">duration</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="p">(</span><span class="nv">min</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="nv">max</span><span class="p">:</span> <span class="kt">Double</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kt">UIColor</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">minColor</span><span class="p">:</span> <span class="p">(</span><span class="kt">Double</span><span class="p">,</span> <span class="kt">Double</span><span class="p">,</span> <span class="kt">Double</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">46</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">113</span><span class="p">)</span>
+        <span class="k">let</span> <span class="nv">maxColor</span><span class="p">:</span> <span class="p">(</span><span class="kt">Double</span><span class="p">,</span> <span class="kt">Double</span><span class="p">,</span> <span class="kt">Double</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">243</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span>
+
+        <span class="k">let</span> <span class="nv">r</span> <span class="o">=</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">0</span> <span class="o">+</span> <span class="p">((</span><span class="n">maxColor</span><span class="o">.</span><span class="mi">0</span> <span class="o">-</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">duration</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">range</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)))</span>
+        <span class="k">let</span> <span class="nv">g</span> <span class="o">=</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">1</span> <span class="o">+</span> <span class="p">((</span><span class="n">maxColor</span><span class="o">.</span><span class="mi">1</span> <span class="o">-</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">duration</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">range</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)))</span>
+        <span class="k">let</span> <span class="nv">b</span> <span class="o">=</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">maxColor</span><span class="o">.</span><span class="mi">2</span> <span class="o">-</span> <span class="n">minColor</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">duration</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">range</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="n">range</span><span class="o">.</span><span class="n">min</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="kt">UIColor</span><span class="p">(</span>
+            <span class="nv">colorLiteralRed</span><span class="p">:</span> <span class="kt">Float</span><span class="p">(</span><span class="n">r</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">),</span>
+            <span class="nv">green</span><span class="p">:</span> <span class="kt">Float</span><span class="p">(</span><span class="n">g</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">),</span>
+            <span class="nv">blue</span><span class="p">:</span> <span class="kt">Float</span><span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">),</span>
+            <span class="nv">alpha</span><span class="p">:</span> <span class="mf">1.0</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// perhitungan warna</span>
+<span class="k">let</span> <span class="nv">color</span> <span class="o">=</span> <span class="kt">UIColor</span><span class="o">.</span><span class="nf">colorForDuration</span><span class="p">(</span><span class="mf">18.0</span><span class="p">,</span> <span class="nv">range</span><span class="p">:(</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">))</span> <span class="c1">// rgb(177, 172, 49)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Menyimpan <code>UICollectionView</code> sebagai gambar</h3>
+
+<p>Setelah seluruh bar telah diposisikan dan diwarnai dengan benar, kita perlu menyimpan seluruh bar sebagai berkas gambar. Kita bisa membuatnya dengan menggunakan <code>UIGraphicsGetImageFromCurrentImageContext()</code>. Namun, <a href="http://stackoverflow.com/a/14376719/851515">kita harus set <code>frame</code> <code>UICollectionView</code></a> kita dengan <code>contentSize</code>-nya agar seluruh konten dari <code>UICollectionView</code> terdeteksi.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">UICollectionView</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">rmdn_takeSnapshot</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">UIImage</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">oldFrame</span> <span class="o">=</span> <span class="k">self</span><span class="o">.</span><span class="n">frame</span>
+
+        <span class="k">var</span> <span class="nv">frame</span> <span class="o">=</span> <span class="k">self</span><span class="o">.</span><span class="n">frame</span>
+        <span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="k">self</span><span class="o">.</span><span class="n">contentSize</span><span class="o">.</span><span class="n">height</span> <span class="c1">// ubah sebelum snapshot</span>
+        <span class="k">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span>
+
+        <span class="kt">UIGraphicsBeginImageContextWithOptions</span><span class="p">(</span><span class="k">self</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="k">self</span><span class="o">.</span><span class="n">opaque</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">self</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="nf">renderInContext</span><span class="p">(</span><span class="kt">UIGraphicsGetCurrentContext</span><span class="p">())</span>
+        <span class="k">let</span> <span class="nv">screenshot</span> <span class="o">=</span> <span class="kt">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">()</span>
+        <span class="kt">UIGraphicsEndImageContext</span><span class="p">()</span>
+
+        <span class="k">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">oldFrame</span> <span class="c1">// ubah kembali ke ukuran sebelumnya</span>
+
+        <span class="k">return</span> <span class="n">screenshot</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Setelah <code>UICollectionView</code> menjadi <code>UIImage</code>, kita bisa menyimpannya ke dalam direktori dokumen (<code>DocumentDirectory</code>). Bila penyimpanan berhasil, fungsi akan mengembalikan sebuah <code>path</code> ke berkas gambar tersebut.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">UIImage</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">rmdn_saveImageWithName</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+        <span class="n">guard</span> <span class="k">let</span> <span class="nv">documentPath</span> <span class="o">=</span> <span class="kt">NSSearchPathForDirectoriesInDomains</span><span class="p">(</span><span class="kt">NSSearchPathDirectory</span><span class="o">.</span><span class="kt">DocumentDirectory</span><span class="p">,</span> <span class="kt">NSSearchPathDomainMask</span><span class="o">.</span><span class="kt">UserDomainMask</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">,</span>
+            <span class="k">let</span> <span class="nv">image</span> <span class="o">=</span> <span class="kt">UIImagePNGRepresentation</span><span class="p">(</span><span class="k">self</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="s">""</span>
+        <span class="p">}</span>
+
+        <span class="k">let</span> <span class="nv">filepath</span> <span class="o">=</span> <span class="n">documentPath</span><span class="o">.</span><span class="nf">stringByAppendingPathComponent</span><span class="p">(</span><span class="s">"</span><span class="se">\(</span><span class="n">name</span><span class="se">)</span><span class="s">.png"</span><span class="p">)</span>
+        <span class="k">let</span> <span class="nv">success</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="nf">writeToFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="nv">atomically</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">success</span> <span class="p">?</span> <span class="nv">filepath</span> <span class="p">:</span> <span class="s">""</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h2>Hasil Akhir</h2>
+
+<p>Berikut visualisasi durasi berpuasa dari kota <a href="/blog/2015-08-06-future-of-ramadhan/london.png">London</a>, <a href="/blog/2015-08-06-future-of-ramadhan/tokyo.png">Tokyo</a>, <a href="/blog/2015-08-06-future-of-ramadhan/reykjavik.png">Reykjavik</a> dan <a href="/blog/2015-08-06-future-of-ramadhan/wellington.png">Wellington</a>.</p>
+
+<p><img alt="Ramadhan around the world" src="/blog/2015-08-06-future-of-ramadhan/ramadhans.png" /></p>
+
+<h2>Kesimpulan</h2>
+
+<p>Cukup asyik menggunakan Swift sebagai kakas visualisasi data karena banyak <em>framework</em> dari Apple maupun 3rd party yang bisa kita gunakan. Fitur bahasa seperti <code>guard</code> dan fungsi-fungsi <code>CollectionType</code> membuat menulis dan membaca kode menjadi lebih menyenangkan. Untuk mencobanya, bisa lihat di laman <a href="https://github.com/ikhsan/FutureOfRamadhan">Github</a>.</p>
+
+<p>Ke depannya, akan lebih asyik lagi jika aplikasi ini dijalankan sebagai <em>playground</em>. Kita tidak perlu lagi Xcode dan simulator hanya untuk menjalankan aplikasinya. Sayangnya, kita belum bisa menggunakan CoreLocation secara sempurna di playground, karena fitur geocoding tidak berjalan dengan sempurna. Jika fitur geocodingnya berfungsi dengan benar, kita juga bisa jalankan kode ini sebuah <em>script</em> sehingga bisa dijalankan dari terminal.</p>
+
+<h2>Referensi</h2>
+
+<ul>
+<li><a href="https://www.udacity.com/course/data-visualization-and-d3js--ud507">Data Visualization and D3.js Course</a> by Udacity</li>
+<li><a href="https://github.com/batoulapps/BAPrayerTimes"><code>BAPrayerTimes</code></a> by Batoul Apps</li>
+<li><a href="http://guidanceapp.com">Guidance for Mac and iOS</a> by Batoul Apps</li>
+</ul>
+
+      <footer>
+  <div class="footer-blog">
+    <p>
+      Saya Ikhsan dan ini adalah blog saya tentang pemikiran seputar koding. Hal-hal selain kodingan saya tulis di blog utama, <a href="http://ikhsan.me">Lifeage</a>. Kontak saya via Twitter <a href="http://twitter.com/ixnixnixn">@ixnixnixn</a> atau langsung saja email di <a href="mailto:ikhsan.assaat@gmail.com">ikhsan.assaat@gmail.com</a>.
+    </p>
+  </div>
+
+  <div class="footer-links">
+  <ul>
+    <li><a href="http://twitter.com/ixnixnixn">Twitter</a></li>
+    <li><a href="http://github.com/ikhsan">Github</a></li>
+    <li><a href="http://ikhsan.me">Lifeage</a></li>
+  </ul>
+
+  <div class="copyright">
+    <p>&copy; Codage 2009–2015</p>
+  </div>
+</div>
+
+
+</footer>
+
+    </div>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-12712252-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>
