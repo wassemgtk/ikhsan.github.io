@@ -4,9 +4,9 @@ date: 2015-08-06 09:21 UTC
 tags: swift
 ---
 
-Pengalaman berpuasa di London membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu saya membuat visualisasi sederhana untuk menjawab rasa penasaran tersebut. READMORE
+Pengalaman berpuasa di London membuat saya ingin mengetahui bagaimana rasanya berpuasa di kota-kota lain di seluruh dunia. Untuk itu [saya membuat visualisasi](http://www.ikhsan.me/post/126462222797/the-future-of-ramadhan) sederhana untuk menjawab rasa penasaran tersebut. READMORE
 
-Situasi ini juga menjadi alasan yang baik untuk berlatih Swift. Mungkin d3 akan menjadi kakas yang paling cocok untuk visualisasi data, namun karena ini hanya sekedar main-main, ya sekalian saja bermain dengan Swift 2.0.
+Situasi ini juga menjadi alasan yang baik untuk berlatih Swift. Mungkin [d3](http://d3js.org) akan menjadi kakas yang paling cocok untuk visualisasi data, namun karena ini hanya sekedar main-main, ya sekalian saja bermain dengan Swift 2.0.
 
 ## Koleksi Data
 

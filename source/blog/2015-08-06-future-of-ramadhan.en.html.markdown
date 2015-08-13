@@ -4,9 +4,9 @@ date: 2015-08-06 09:24 UTC
 tags: swift
 ---
 
-Fasting in London during Ramadhan made me think about how long should other Muslims around the world fast. Motivated by my own curiosity, I created a visualisation to answer that question. READMORE
+Fasting in London during Ramadhan made me think about how long should other Muslims around the world fast. Motivated by my own curiosity, [I created a visualisation](http://www.ikhsan.me/post/126462222797/the-future-of-ramadhan) to answer that question. READMORE
 
-This also serves as an opportunity for me to practice Swift. Although using d3 might be the best way for data visualisation, just for the sake of having fun, why don't we use Swift instead.
+This also serves as an opportunity for me to practice Swift. Although using [d3](http://d3js.org) might be the best way for data visualisation, just for the sake of having fun, why don't we use Swift instead.
 
 ## Data Collection
 
