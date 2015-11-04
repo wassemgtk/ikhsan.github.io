@@ -102,7 +102,6 @@ enum StringerError: ErrorType {
 - untuk mengambil konten teks dari file, kita bisa gunakan fungsi dari NSString
 
 
-
 ```swift
 let content = try NSString(contentsOfFile: filepath, encoding: NSUTF8StringEncoding)
 ```
