@@ -4,17 +4,23 @@ date: 2015-10-17 22:48 UTC
 tags: swift, scripting
 ---
 
-Belum lama, saya diberikan tugas di kantor untuk mengekstraksi kopi di `"Localizable.strings"` ke format excel. Pikir saya ini agak membosankan bila mengerjakan tugas ini dengan cara manual. Maka, saya pikir ini adalah sebuah kesempatan untuk kembali menggunakan Swift. READMORE
+Belum lama, saya diberikan tugas di tempat kerja saya untuk mengekstraksi kopi dari `"Localizable.strings"` ke format excel. Pikir saya, ini tugas akan membosankan bila dikerjakan dengan cara manual. Maka, saya ambil kesempatan ini untuk kembali bermain dengan Swift. READMORE
 
-Terilhami dari presentasi dari [Ayaka di Swift Summit](https://realm.io/news/swift-scripting/), tiap tugas kecil seperti ini bisa lho dikerjakan dengan Swift. Intinya, walaupun belum ada kode Swift dalam proyek utama kita bukan berarti kita tidak bisa menggunakan Swift sama sekali.
+Terilhami dari presentasi [Ayaka di Swift Summit](https://realm.io/news/swift-scripting/), tiap tugas kecil seperti ini ternyata bisa lho dikerjakan dengan Swift. Intinya, walaupun belum ada kode Swift dalam proyek utama kita, bukan berarti kita tidak bisa menyentuh Swift sama sekali.
 
 ### Membuat dan Menjalankan Skrip dengan Swift
 
 * Pastikan Xcode sudah ter-install
-* Buat file Swift (saya namakan `xtractr.swift`) seperti berikut
+* Buat file swift (saya namakan `xtractr.swift`)
+* Tambah notasi _shebang_ di baris pertama untuk mengkompilasi seluruh kode dengan swift REPL
 
 ```swift
 #!/usr/bin/env xcrun swift
+```
+
+* Gunakan `print()` untuk menampilkan teks di layar console
+
+```swift
 print("Teks ini dibuat dengan Swift!")
 ```
 
@@ -36,9 +42,9 @@ Cukup mudah kan? Setelah hanya menampilkan contoh teks, mari kita buat pengurai 
 
 ### Membaca parameter dari terminal
 
-Untuk mendapatkan nama file dari terminal, kita bisa gunakan variabel `Process.arguments`. Variabel ini berisi semua kata yang diketikkan saat dijalankan dari terminal.
+Untuk mendapatkan nama file dari terminal, kita bisa gunakan variabel `Process.arguments`. Variabel ini berisi semua parameter yang diketikkan saat dijalankan dari terminal.
 
-Silahkan ganti perintah cetak teks kita menjadi cetak parameter-parameter. File skrip kita akan menjadi seperti ini;
+Bila ingin melihat parameter yang kita dapatkan dari terminal, ubah skrip kita menjadi seperti di bawah;
 
 ```swift
 #!/usr/bin/env xcrun swift
@@ -52,10 +58,7 @@ $ ./xtractr.swift tes argumen 123
 ["./xtractr.swift", "tes", "argumen", "123"]
 ```
 
-Bisa kita lihat, kata per kata dirangkum dalam list `Process.arguments` (termasuk nama programmnya sendiri). Skrip kita hanya akan mengharapkan satu buah parameter, yaitu filepath dari file string itu sendiri.
-
-Sehingga kita bisa rangkum menjadi sebuah fungsi tersendiri, yang akan mengecek jumlah parameter dan mengambil parameter pertama sebagai filepath.
-
+Bisa kita lihat, kata per kata dirangkum dalam list `Process.arguments` (termasuk nama programmnya sendiri). Skrip kita hanya akan mengharapkan satu buah parameter, yaitu alamat dari berkas 'Localizable.strings' itu sendiri. Kita bisa rangkum menjadi sebuah fungsi yang akan mengecek jumlah parameter dan mengambil parameter pertama sebagai filepath.
 
 ```swift
 #!/usr/bin/env xcrun swift
@@ -70,7 +73,7 @@ func getParameter() -> String {
 print(getParameter())
 ```
 
-Sebelum mencoba kembali, kopi suatu file Localizable.strings kita punya ke dalam direktori yang aktif di terminal. Jalankan kembali dengan menggunakan nama file yang benar. Coba cek juga bila tanpa menggunakan parameter, atau menggunakan lebih dari satu parameter.
+Sebelum mencoba kembali, kopi suatu file Localizable.strings kita punya ke dalam direktori yang aktif di terminal (saya taruh di `~/Desktop`). Jalankan kembali dengan menggunakan nama file yang benar. Coba cek juga bila tanpa menggunakan parameter, atau menggunakan lebih dari satu parameter.
 
 ```sh
 $ ./xtractr.swift Localizable.strings
@@ -81,18 +84,27 @@ $ ./xtractr.swift Localizable.strings 123 heyho
 Localizable.strings
 ```
 
-### Membaca teks dari file
+### Error handling
+
+- sebelum lanjut, kita akan membuat error type untuk keperluan kita
+- kita akan menggunakan do-try-catch
 
 ```swift
-func contentFromFile(filename: String) throws -> NSString {
-    let filepath = "\(NSFileManager.defaultManager().currentDirectoryPath)/\(filename)"
-
-    guard NSFileManager.defaultManager().fileExistsAtPath(filepath) else {
-        throw StringerError.FileNotFound(filepath: filepath)
-    }
-
-    return try NSString(contentsOfFile: filepath, encoding: NSUTF8StringEncoding)
+enum StringerError: ErrorType {
+    case NoFileSpecified
+    case FileNotFound(filepath: String)
+    case ParsingFailed
 }
+```
+
+### Membaca teks dari file
+
+- untuk mengambil konten teks dari file, kita bisa gunakan fungsi dari NSString
+
+
+
+```swift
+let content = try NSString(contentsOfFile: filepath, encoding: NSUTF8StringEncoding)
 ```
 
 ### Mengurai teks dari Localizable.strings
