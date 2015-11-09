@@ -40,32 +40,32 @@ $ ./xtractr.swift
 
 Simple right? After we have successfully print a text, lets try build our real parser for `Localizable.strings`
 
-### Membaca parameter dari terminal
+### Reading arguments from terminal
 
-Untuk mendapatkan nama file dari terminal, kita bisa gunakan variabel `Process.arguments`. Variabel ini berisi semua parameter yang diketikkan saat dijalankan dari terminal.
+To receive the filename from terminal, we could use a variable called `Process.arguments`. This variable has all the arguments
+that is added when the app is called.
 
-Bila ingin melihat parameter yang kita dapatkan dari terminal, ubah skrip kita menjadi seperti di bawah
+Try to change our script so that it prints all the arguments
 
 ```swift
 #!/usr/bin/env xcrun swift
 print(Process.arguments)
 ```
 
-Jalankan kembali di terminal
+Now run the script with some arguments
 
 ```sh
-$ ./xtractr.swift tes argumen 123
-["./xtractr.swift", "tes", "argumen", "123"]
+$ ./xtractr.swift test arguments 123
+["./xtractr.swift", "test", "arguments", "123"]
 ```
-
-Bisa kita lihat, kata per kata dirangkum dalam list `Process.arguments` (termasuk nama programmnya sendiri). Skrip kita hanya akan mengharapkan satu buah parameter, yaitu alamat dari berkas `Localizable.strings` itu sendiri. Kita bisa rangkum menjadi sebuah fungsi yang akan mengecek jumlah parameter dan mengambil parameter pertama sebagai filepath.
+As we can see, each word is included in the list (which also includes the filename itself). We want to create a script that expects only one parameter, which is the path to a strings file. We could tidy this ability to its own function, which could also checks the total of parameters and uses the first one as its path.
 
 ```swift
 #!/usr/bin/env xcrun swift
 
 func getParameter() -> String {
     guard Process.arguments.count >= 2 else {
-        return "File tidak ditemukan"
+        return "File is not found"
     }
     return Process.arguments[1]
 }
@@ -73,18 +73,19 @@ func getParameter() -> String {
 print(getParameter())
 ```
 
-Sebelum mencoba kembali, cari suatu file `Localizable.strings` dari salah satu proyek yang sudah ada ke dalam direktori yang aktif di terminal (saya taruh di `~/Desktop`). Jalankan kembali dengan menggunakan nama file yang benar. Coba cek juga tanpa menggunakan parameter dab menggunakan lebih dari satu parameter.
+Before you continue on testing the script, try to find any `Localizable.strings` that you have and put inside the same directory as the script (I put mine in `~/Desktop`). Run the script again without an argument, one argument and multiple arguments.
+
 
 ```sh
+$ ./xtractr.swift     
+File is not found
 $ ./xtractr.swift Localizable.strings
 Localizable.strings
-$ ./xtractr.swift     
-File tidak ditemukan
 $ ./xtractr.swift Localizable.strings 123 heyho
 Localizable.strings
 ```
 
-### Membaca teks dari file
+### Reading contents from file
 
 Untuk membaca konten teks dari sebuah file, kita bisa gunakan fungsi konstruktor dari `NSString` yang menerima parameter filepath dan encoding.
 
