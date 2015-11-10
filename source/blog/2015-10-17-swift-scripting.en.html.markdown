@@ -87,24 +87,24 @@ Localizable.strings
 
 ### Reading contents from file
 
-Untuk membaca konten teks dari sebuah file, kita bisa gunakan fungsi konstruktor dari `NSString` yang menerima parameter filepath dan encoding.
+To read the contents of a file, we could use `NSString`'s constructor method that expects a file path.
 
 ```swift
 let content = try NSString(contentsOfFile: filepath, encoding: NSUTF8StringEncoding)
 ```
 
-Bisa kita periksa bahwa tipe yang digunakan adalah `NSString` dan bukan `String` dari Swift. Kita bisa konversi dari tipe satu ke tipe lainnya, namun karena kita menggunakan beberapa perilaku dan method dari `NSString` maka kita biarkan dulu dan konversi ke `String` hanya saat diperlukan.
+If we look closely, the type that we use is `NSString` instead of Swift's `String`. We could convert from one type to another quite easily but we just keep using `NSString` because we need its behaviors and methods, and just convert the type once needed.
 
-### Mengurai teks dari `Localizable.strings`
+### Parsing the texts of `Localizable.strings`
 
-Penguraian akan menggunakan `NSRegularExpression` yang akan menemukan semua string dalam file yang berformat : `"<key>" = "<value>";`.
+Our parser will use `NSRegularExpression` which will find all the strings from the file that match the pattern : `"<key>" = "<value>";`.
 
 ```swift
 let regex = try NSRegularExpression(pattern: "\"(.+?)\"\\s*=\\s*\"(.+?)\"\\s*;", options: .CaseInsensitive)
 let matches = regex.matchesInString((query as String), options: .WithTransparentBounds, range: NSMakeRange(0, query.length))
 ```
 
-Variable `matches` akan berisi array dari objek `NSTextCheckingResult`. `NSTextCheckingResult` mempunyai sebuah list lagi yang berisi `NSRange` yang menunjukan lokasi-lokasi dari string yang cocok dengan format regex yang kita berikan. Untuk mendapatkan semua string yang dari sebuah `NSTextCheckingResult` kita harus mengaksesnya dengan `rangeAtIndex`
+Variable `matches` is an array of `NSTextCheckingResult`. `NSTextCheckingResult` has a list of `NSRange` that refers to locations of all the string that match the pattern that is given. To get all the string from an instance of `NSTextCheckingResult`, we can access it via its `rangeAtIndex` method.
 
 ```swift
 var strings = [String]()
@@ -115,11 +115,11 @@ for index in 0..<(match.numberOfRanges) {
 return strings
 ```
 
-Setiap array string yang kita dapatkan akan berjumlah tiga, yaitu dalam kesatuan format `"<key>" = "<value>";`, `<key>` dan terakhir `<value>`. Kita hanya akan menggunakan 2 string terakhir dari setiap array string kita.
+Apparently, every array of strings that we receive has a total of three; a format of the whole pattern (`"<key>" = "<value>";`), its key (`<key>`) and last its value (`<value>`). For our purpose, we only need the last two which is the key and value pair.
 
-Terakhir kita akan mengkonversi semua pasangan <key, value> kita ke dalam format yang bisa dibaca excel. Format yang paling mudah adalah format csv atau comma separated value. Intinya tiap kolom akan dipisahkan dengan koma; "`<key>,<value>\n`"
+Lastly, we convert every key-value pair to a format that is readable by Excel. The easiest format is comma-separated values or known as CSV file. The file should simply separate each column with a comma, so for us we need to format our pair to be; "`<key>,<value>\n`"
 
-Bila kita gabung seluruh proses ini menjadi satu kesatuan, funsi pengurai akan terlihat seperti berikut
+If we combine all the parsing processes into one, its function would looked like below
 
 ```swift
 func parse(query: NSString) throws -> String {
@@ -128,7 +128,7 @@ func parse(query: NSString) throws -> String {
 
     let results = matches
 
-        // transformasi dari NSTextCheckingResult menjadi array String
+        // transforms NSTextCheckingResult to an array of Strings
         .map { match -> [String] in
             var strings = [String]()
             for index in 0..<(match.numberOfRanges) {
@@ -138,10 +138,10 @@ func parse(query: NSString) throws -> String {
             return strings
         }
 
-        // periksa apakah pasti ada tiga atau lebih string
+        // checks if the Strings is more than three
         .filter { $0.count >= 3 }
 
-        // transformasi dari array string menjadi key value yang terpisah oleh koma
+        // transforms an array of string into a comma-separated key value pairs
         .reduce("") { (initial, strings) -> String in
             return initial + "\(strings[1]),\(strings[2])\n"
         }
@@ -150,15 +150,20 @@ func parse(query: NSString) throws -> String {
 }
 ```
 
-### Hasil akhir
+### Result
 
-Kode akhir bisa lihat di [sini](2015-10-17-swift-scripting/xtractr.swift), berikut dengan penanganan error yang lebih lengkap.
+The final code can be reviewed [here](2015-10-17-swift-scripting/xtractr.swift). Also, I have added error handling using custom `ErrorType`s and `guard`s.
 
-Namun saat kita jalankan, skrip ini hanya akan menampikan konten csv di dalam terminal. Untuk menyimpannya ke dalam file, kita harus pass hasil cetak tersebut langsung di terminal dengan format "` > nama_file.csv`".
+Although, this script only prints the csv contents in the terminal instead of making a new file. To put all the csv content to a file, we need to pass it in terminal using this format "` > <file_name>.csv`".
 
 ```sh
-$ ./xtractr.swift Localizable.strings # hanya mencetak di terminal
-$ ./xtractr.swift Localizable.strings > extracted.csv # mencetak ke dalam sebuah file extracted.csv
+$ ./xtractr.swift Localizable.strings # only prints in terminal
+$ ./xtractr.swift Localizable.strings > extracted.csv # create a new file 'extracted.csv' and put all the contents inside
 ```
+Even though this task is simple, but we made it so that it is more interesting and fun! I challenged myself to use Swift and I really enjoyed it. See you in another Swift scripting posts!
 
-Walau tugas saya saat itu cukup remeh namun tugas ini jadi lebih menarik dan lebih menyenangkan karena saya menantang diri saya dengan menggunakan Swift. Sampai jumpa di skrip-skrip Swift selanjutnya!
+---
+
+## Update 10-11-2015
+
+If you need a more advanced inspiration on Swift scripting, take a look [Ayaka's post](http://swift.ayaka.me/posts/2015/11/5/swift-scripting-generating-acknowledgements-for-cocoapods-and-carthage-dependencies) on making acknowledgement page by reading its Cocoapods and Carthage dependencies. Really neat!

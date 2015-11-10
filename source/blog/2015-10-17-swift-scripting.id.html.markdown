@@ -103,7 +103,7 @@ let regex = try NSRegularExpression(pattern: "\"(.+?)\"\\s*=\\s*\"(.+?)\"\\s*;",
 let matches = regex.matchesInString((query as String), options: .WithTransparentBounds, range: NSMakeRange(0, query.length))
 ```
 
-Variable `matches` akan berisi array dari objek `NSTextCheckingResult`. `NSTextCheckingResult` mempunyai sebuah list lagi yang berisi `NSRange` yang menunjukan lokasi-lokasi dari string yang cocok dengan format regex yang kita berikan. Untuk mendapatkan semua string yang dari sebuah `NSTextCheckingResult` kita harus mengaksesnya dengan `rangeAtIndex`
+Variabel `matches` akan berisi array dari objek `NSTextCheckingResult`. `NSTextCheckingResult` mempunyai sebuah list lagi yang berisi `NSRange` yang menunjukan lokasi-lokasi dari string yang cocok dengan format regex yang kita berikan. Untuk mendapatkan semua string yang dari sebuah `NSTextCheckingResult` kita harus mengaksesnya dengan `rangeAtIndex`
 
 ```swift
 var strings = [String]()
@@ -114,11 +114,11 @@ for index in 0..<(match.numberOfRanges) {
 return strings
 ```
 
-Setiap array string yang kita dapatkan akan berjumlah tiga, yaitu dalam kesatuan format `"<key>" = "<value>";`, `<key>` dan terakhir `<value>`. Kita hanya akan menggunakan 2 string terakhir dari setiap array string kita.
+Setiap array string yang kita dapatkan akan berjumlah tiga, yaitu dalam kesatuan format (`"<key>" = "<value>";`), key-nya (`<key>`) dan terakhir value dari key tersebut (`<value>`). Kita hanya akan menggunakan 2 string terakhir dari setiap array string kita.
 
-Terakhir kita akan mengkonversi semua pasangan <key, value> kita ke dalam format yang bisa dibaca excel. Format yang paling mudah adalah format csv atau comma separated value. Intinya tiap kolom akan dipisahkan dengan koma; "`<key>,<value>\n`"
+Terakhir kita akan mengkonversi semua pasangan <key, value> kita ke dalam format yang bisa dibaca Excel. Format yang paling mudah adalah format csv atau comma separated value. Intinya tiap kolom akan dipisahkan dengan koma; "`<key>,<value>\n`"
 
-Bila kita gabung seluruh proses ini menjadi satu kesatuan, funsi pengurai akan terlihat seperti berikut
+Bila kita gabung seluruh proses ini menjadi satu kesatuan, fungsi pengurai akan terlihat seperti berikut
 
 ```swift
 func parse(query: NSString) throws -> String {
@@ -161,3 +161,9 @@ $ ./xtractr.swift Localizable.strings > extracted.csv # mencetak ke dalam sebuah
 ```
 
 Walau tugas saya saat itu cukup remeh namun tugas ini jadi lebih menarik dan lebih menyenangkan karena saya menantang diri saya dengan menggunakan Swift. Sampai jumpa di skrip-skrip Swift selanjutnya!
+
+---
+
+## Update 10-11-2015
+
+Kalau perlu contoh lain yang lebih advance, bisa cek [postingan Ayaka](http://swift.ayaka.me/posts/2015/11/5/swift-scripting-generating-acknowledgements-for-cocoapods-and-carthage-dependencies) tentang bagaimana dia membuat halaman acknowledgement dengan membaca file Cocoapods and Carthage. Keren cuy!
