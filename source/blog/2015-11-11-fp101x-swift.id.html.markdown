@@ -1,0 +1,5 @@
+---
+title: FP101x - Validasi kartu kredit dengan Swift
+date: 2015-11-11 13:28 UTC
+tags: functional programming, swift, haskell
+---

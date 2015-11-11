@@ -1,0 +1,5 @@
+---
+title: FP101x - Credit card validation with Swift
+date: 2015-11-11 13:28 UTC
+tags: functional programming, swift, haskell
+---
