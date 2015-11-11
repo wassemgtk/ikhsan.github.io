@@ -152,7 +152,7 @@ func parse(query: NSString) throws -> String {
 
 ### Result
 
-The final code can be reviewed [here](2015-10-17-swift-scripting/xtractr.swift). Also, I have added error handling using custom `ErrorType`s and `guard`s.
+The final code can be reviewed [here](https://github.com/ikhsan/ikhsan.github.io/blob/develop/source/blog/2015-10-17-swift-scripting/xtractr.swift). Also, I have added error handling using custom `ErrorType`s and `guard`s.
 
 Although, this script only prints the csv contents in the terminal instead of making a new file. To put all the csv content to a file, we need to pass it in terminal using this format "` > <file_name>.csv`".
 

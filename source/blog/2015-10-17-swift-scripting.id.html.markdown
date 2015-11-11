@@ -151,7 +151,7 @@ func parse(query: NSString) throws -> String {
 
 ### Hasil akhir
 
-Kode akhir bisa lihat di [sini](2015-10-17-swift-scripting/xtractr.swift), berikut dengan penanganan error yang lebih lengkap.
+Kode akhir bisa lihat di [sini](https://github.com/ikhsan/ikhsan.github.io/blob/develop/source/blog/2015-10-17-swift-scripting/xtractr.swift), berikut dengan penanganan error yang lebih lengkap.
 
 Namun saat kita jalankan, skrip ini hanya akan menampikan konten csv di dalam terminal. Untuk menyimpannya ke dalam file, kita harus pass hasil cetak tersebut langsung di terminal dengan format "` > nama_file.csv`".
 
