@@ -6,7 +6,7 @@ tags: swift, scripting
 
 I was given a tedious task at work that to extract all the strings from `"Localizable.strings"` in our iOS project to an excel spreadsheet. I was wondering how to make this more interesting and more challenging. So I took this task to be another opportunity to play around with Swift. READMORE
 
-I was inspired by Ayaka's talk on Swift Summit that even though you have not yet used Swift for the main project, we could tackel small problems with Swift.
+I was inspired by [Ayaka's talk](https://realm.io/news/swift-scripting/) on Swift Summit that even though you have not yet used Swift for the main project, we could tackel small problems with Swift.
 
 ### Making and Running Swift Script
 
