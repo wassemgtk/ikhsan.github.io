@@ -29,16 +29,15 @@ Since the final value is 0, we know that the above number is a valid credit card
 
 */
 
-/*: 
+/*:
 __Ex. 0__
-Define a function 
+Define a function
 
-`toDigits(digit: Int) -> [Int]` 
+`toDigits(digit: Int) -> [Int]`
 
 that takes a `n: Integer` where `n >= 0` and returns a list of the digits of n. More precisely, `toDigits` should satisfy the following properties, for all `n : Integer`  where `n >= 0` :
 
 * eval(toDigits(n)) == n
-* all (\d -> d >= 0 && d < 10) (toDigits n) << !!!!
 * String(n).count == (toDigits(n)).count
 
 Note: `eval` is specified in the `helper.swift` file
@@ -58,7 +57,6 @@ Define a function
 that takes a `n: Integer` where `n >= 0` and returns a list of the digits of n in reverse order. More precisely, `toDigitsRev` should satisfy the following properties, for all `n : Integer`  where `n >= 0`:
 
 * n == evalRev(toDigitsRev(n))
-* all (\d -> d >= 0 && d < 10) (toDigits n) << !!!!
 * String(n).count == (toDigitsRev(n)).count
 
 Note: `evalRev` is specified in the `helper.swift` file
@@ -93,7 +91,7 @@ The output of `doubleSecond` has a mix of one-digit and two-digit numbers. Defin
 
 to calculate the sum of all individual digits, even if a number in the list has more than 2 digits.
 
-Example:  
+Example:
 `sumDigits [8,14,6,10] = 8 + (1 + 4) + 6 + (1 + 0) = 20`
 
 `sumDigits [3,9,4,15,8] = 3 + 9 + 4 + (1 + 5) + 8 = 30`
@@ -133,3 +131,4 @@ func numValid(digits: [Int]) -> Int {
         .filter(isValid)
         .count
 }
+
