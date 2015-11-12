@@ -1,5 +1,17 @@
 ---
-title: FP101x - Validasi kartu kredit dengan Swift
+title: "[FP101x] Validasi kartu kredit dengan Swift"
 date: 2015-11-11 13:28 UTC
 tags: functional programming, swift, haskell
 ---
+
+namun karena sampai saat ini belum ada, saya buat saja sendiri versi playground-nya sehingga bisa digunakan siapapun, sekalipun tidak sedang mengambil kelas fp101.
+
+berikut kutipan dari latihannya, dan ini file lengkapnya tersedia sebagai lab2.playground.
+
+`kutipan lab2.playground`
+
+kalau mau lihat file aslinya dari haskell, bisa lihat di lab2.hs.
+
+`kutipan lab2.hs`
+
+Tentu saja saya akan mempost solusinya setelah deadline-nya lewat. Silahkan cek kembali halaman ini untuk mendiskusikan solusi latihan ini.

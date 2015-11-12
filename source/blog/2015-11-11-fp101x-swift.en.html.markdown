@@ -1,5 +1,73 @@
 ---
-title: FP101x - Credit card validation with Swift
+title: "[FP101x] Credit card validation with Swift"
 date: 2015-11-11 13:28 UTC
 tags: functional programming, swift, haskell
 ---
+
+I am currently taking [TUDelft's "FP101x - Intro to Functional Programming"](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0) class at edX, and I am enjoying it so far.READMORE
+
+The reason why this exists is because I want to share my exercises that I did from the FP101x class using Swift. Even, the instructor of the class, [Erik Meijer](https://twitter.com/headinthebox), said this a while back:
+
+<blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">At this point, <a href="https://twitter.com/SwiftLang">@SwiftLang</a> is probably a better, and more valuable, vehicle for learning functional programming than Haskell.</p>&mdash; Erik Meijer (@headinthebox) <a href="https://twitter.com/headinthebox/status/655407294969196544">October 17, 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Since there is no swift code that has been found in the class, I ported the haskell file into a Swift playground file. With this, everyone is able practice without the need of taking the actual class.
+
+### Lab2.swift
+
+This is the port of the lab2.hs exercise;
+
+```swift
+
+// Helpers
+func eval(digits: [Int]) -> Int {
+    return digits.reduce(0, combine: { initValue, digit in
+        digit + (initValue * 10)
+    })
+}
+
+func evalRev(digits: [Int]) -> Int {
+    // using reversed iterator because there's no foldr in swift
+    var result = 0
+    for index in (digits.count-1).stride(through: 0, by: -1) {
+        result = (result * 10) + digits[index]
+    }
+    return result
+}
+
+// Ex. 0
+func toDigits(digit: Int) -> [Int] {
+    return []
+}
+
+// Ex. 1
+func toDigitsRev(digit: Int) -> [Int] {
+    return []
+}
+
+// Ex. 2
+func doubleSecond(digits: [Int]) -> [Int] {
+    return []
+}
+
+// Ex. 3
+func sumDigits(digits: [Int]) -> Int {
+    return 0
+}
+
+// Ex. 4
+func isValid(digit: Int) -> Bool {
+    return false
+}
+```
+
+For the complete version of this exercise, you can download the full playground file: [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground)
+
+![playground](blog/2015-11-11-fp101x-swift/playground.png)
+
+### Haskell version
+
+If you are interested to check the original exercise in haskell, you can see it [here](2015-11-11-fp101x-swift/lab2.hs).
+
+## Solution
+
+I will post my solution once its deadline is passed. So please come back after November 26th to discuss and compare our solutions!
