@@ -6,8 +6,8 @@
     <title>Codeage - First Impressions on Porting Objective-C Code to Swift</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
 
-    <link href="/stylesheets/all.css" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/all.css" rel="stylesheet" />
+    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" />
   </head>
   <body>
 
@@ -97,7 +97,7 @@
 
 <span class="kd">func</span> <span class="nf">openArtist</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// you could also unwrap optional with guard</span>
-  <span class="n">guard</span> <span class="k">let</span> <span class="nv">a</span> <span class="o">=</span> <span class="n">artist</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">guard</span> <span class="k">let</span> <span class="nv">a</span> <span class="o">=</span> <span class="n">artist</span> <span class="k">else</span> <span class="p">{</span>
     <span class="k">return</span>
   <span class="p">}</span>
   <span class="nf">openArtist</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
@@ -151,14 +151,14 @@
 10
 11
 12</pre></td><td class="code"><pre><span class="c1">// header.swift</span>
-<span class="kd">class</span> <span class="kd">func</span> <span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">,</span> <span class="n">options</span> <span class="nv">opt</span><span class="p">:</span> <span class="kt">NSJSONReadingOptions</span><span class="p">)</span> <span class="n">throws</span> <span class="o">-&gt;</span> <span class="kt">AnyObject</span>
+<span class="kd">class</span> <span class="kd">func</span> <span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">,</span> <span class="n">options</span> <span class="nv">opt</span><span class="p">:</span> <span class="kt">NSJSONReadingOptions</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">AnyObject</span>
 
 <span class="c1">// implementation.swift</span>
 <span class="kd">func</span> <span class="nf">convertData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">do</span> <span class="p">{</span>
-    <span class="k">let</span> <span class="nv">result</span> <span class="o">=</span> <span class="n">try</span> <span class="kt">NSJSONSerialization</span><span class="o">.</span><span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">AllowFragments</span><span class="p">)</span> <span class="k">as!</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">AnyObject</span><span class="p">]</span>
+    <span class="k">let</span> <span class="nv">result</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSJSONSerialization</span><span class="o">.</span><span class="kt">JSONObjectWithData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">AllowFragments</span><span class="p">)</span> <span class="k">as!</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">AnyObject</span><span class="p">]</span>
     <span class="c1">// using the result</span>
-  <span class="p">}</span> <span class="n">catch</span> <span class="p">{</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
     <span class="c1">// handle the error</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -281,7 +281,7 @@
 4
 5</pre></td><td class="code"><pre><span class="c1">// Tests.swift</span>
 <span class="kd">import</span> <span class="kt">XCTest</span>
-<span class="err">@testable</span> <span class="o">&lt;</span><span class="n">module</span> <span class="n">name</span><span class="o">&gt;</span>
+<span class="kd">@testable</span> <span class="o">&lt;</span><span class="n">module</span> <span class="n">name</span><span class="o">&gt;</span>
 
 <span class="c1">// here unit tests have access to private stuff</span>
 </pre></td></tr></tbody></table>

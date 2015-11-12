@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Codeage</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
+
+    <link href="/stylesheets/all.css" rel="stylesheet" />
+  </head>
+  <body>
+
+    <div id="main" role="main">
+      
+
+
+<nav>
+  <h1 class="blog-title"><a href="/id/">Codeage</a></h1>
+  <p class="blog-description">
+    Pardon my ramblings about code and such
+  </p>
+  <div class="blog-lang">
+    <a href="/#">English</a> / <strong>Bahasa</strong>
+  </div>
+</nav>
+
+      <p>Belum lama, saya diberikan tugas di tempat kerja saya untuk mengekstraksi kopi dari <code>Localizable.strings</code> ke format excel. Pikir saya ini tugas agaknya membosankan bila dikerjakan dengan cara manual. Maka saya ambil kesempatan ini untuk kembali bermain dengan Swift. READMORE</p>
+
+<p>Terilhami dari presentasi <a href="https://realm.io/news/swift-scripting/">Ayaka di Swift Summit</a>, tiap tugas kecil seperti ini ternyata bisa lho dikerjakan dengan Swift. Intinya, walaupun belum ada kode Swift dalam proyek utama kita, bukan berarti kita tidak bisa menyentuh Swift sama sekali.</p>
+
+<h3>Membuat dan Menjalankan Skrip dengan Swift</h3>
+
+<ul>
+<li>Pastikan Xcode sudah ter-install</li>
+<li>Buat file swift (saya namakan &rsquo;<code>xtractr.swift</code>&rsquo;)</li>
+<li>Tambah notasi <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)"><em>shebang</em></a> di baris pertama untuk mengkompilasi seluruh kode dengan swift REPL</li>
+</ul>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>Gunakan <code>print()</code> untuk menampilkan teks di layar console</li>
+</ul>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="nf">print</span><span class="p">(</span><span class="s">"Teks ini dibuat dengan Swift!"</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>Di terminal, ganti file permission menjadi executable</li>
+</ul>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre>// pastikan kita berada di direktorinya xtractr.swift
+<span class="gp">$ </span>chmod +x xtractr.swift
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>Jalankan skrip dari terminal</li>
+</ul>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift
+<span class="s2">"Teks ini dibuat dengan Swift!"</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Cukup mudah kan? Setelah hanya menampilkan contoh teks, mari kita buat pengurai <code>Localizable.strings</code> yang sebenarnya.</p>
+
+<h3>Membaca parameter dari terminal</h3>
+
+<p>Untuk mendapatkan nama file dari terminal, kita bisa gunakan variabel <code>Process.arguments</code>. Variabel ini berisi semua parameter yang diketikkan saat dijalankan dari terminal.</p>
+
+<p>Bila ingin melihat parameter yang kita dapatkan dari terminal, ubah skrip kita menjadi seperti di bawah</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+<span class="nf">print</span><span class="p">(</span><span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Jalankan kembali di terminal</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift tes argumen 123
+<span class="o">[</span><span class="s2">"./xtractr.swift"</span>, <span class="s2">"tes"</span>, <span class="s2">"argumen"</span>, <span class="s2">"123"</span><span class="o">]</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Bisa kita lihat, kata per kata dirangkum dalam list <code>Process.arguments</code> (termasuk nama programmnya sendiri). Skrip kita hanya akan mengharapkan satu buah parameter, yaitu alamat dari berkas <code>Localizable.strings</code> itu sendiri. Kita bisa rangkum menjadi sebuah fungsi yang akan mengecek jumlah parameter dan mengambil parameter pertama sebagai filepath.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+
+<span class="kd">func</span> <span class="nf">getParameter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s">"File tidak ditemukan"</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">getParameter</span><span class="p">())</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Sebelum mencoba kembali, cari suatu file <code>Localizable.strings</code> dari salah satu proyek yang sudah ada ke dalam direktori yang aktif di terminal (saya taruh di <code>~/Desktop</code>). Jalankan kembali dengan menggunakan nama file yang benar. Coba cek juga tanpa menggunakan parameter dab menggunakan lebih dari satu parameter.</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift Localizable.strings
+Localizable.strings
+<span class="gp">$ </span>./xtractr.swift     
+File tidak ditemukan
+<span class="gp">$ </span>./xtractr.swift Localizable.strings 123 heyho
+Localizable.strings
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Membaca teks dari file</h3>
+
+<p>Untuk membaca konten teks dari sebuah file, kita bisa gunakan fungsi konstruktor dari <code>NSString</code> yang menerima parameter filepath dan encoding.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="k">let</span> <span class="nv">content</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSString</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="kt">NSUTF8StringEncoding</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Bisa kita periksa bahwa tipe yang digunakan adalah <code>NSString</code> dan bukan <code>String</code> dari Swift. Kita bisa konversi dari tipe satu ke tipe lainnya, namun karena kita menggunakan beberapa perilaku dan method dari <code>NSString</code> maka kita biarkan dulu dan konversi ke <code>String</code> hanya saat diperlukan.</p>
+
+<h3>Mengurai teks dari <code>Localizable.strings</code></h3>
+
+<p>Penguraian akan menggunakan <code>NSRegularExpression</code> yang akan menemukan semua string dalam file yang berformat : <code>&quot;&lt;key&gt;&quot; = &quot;&lt;value&gt;&quot;;</code>.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*=</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*;"</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">CaseInsensitive</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">matches</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="nf">matchesInString</span><span class="p">((</span><span class="n">query</span> <span class="k">as</span> <span class="kt">String</span><span class="p">),</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">WithTransparentBounds</span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">NSMakeRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Variabel <code>matches</code> akan berisi array dari objek <code>NSTextCheckingResult</code>. <code>NSTextCheckingResult</code> mempunyai sebuah list lagi yang berisi <code>NSRange</code> yang menunjukan lokasi-lokasi dari string yang cocok dengan format regex yang kita berikan. Untuk mendapatkan semua string yang dari sebuah <code>NSTextCheckingResult</code> kita harus mengaksesnya dengan <code>rangeAtIndex</code></p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">var</span> <span class="nv">strings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+<span class="k">for</span> <span class="n">index</span> <span class="k">in</span> <span class="mi">0</span><span class="o">..&lt;</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">numberOfRanges</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="nf">rangeAtIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">strings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="nf">substringWithRange</span><span class="p">(</span><span class="n">range</span><span class="p">)</span> <span class="k">as</span> <span class="kt">String</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">return</span> <span class="n">strings</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Setiap array string yang kita dapatkan akan berjumlah tiga, yaitu dalam kesatuan format (<code>&quot;&lt;key&gt;&quot; = &quot;&lt;value&gt;&quot;;</code>), key-nya (<code>&lt;key&gt;</code>) dan terakhir value dari key tersebut (<code>&lt;value&gt;</code>). Kita hanya akan menggunakan 2 string terakhir dari setiap array string kita.</p>
+
+<p>Terakhir kita akan mengkonversi semua pasangan <key, value> kita ke dalam format yang bisa dibaca Excel. Format yang paling mudah adalah format csv atau comma separated value. Intinya tiap kolom akan dipisahkan dengan koma; &ldquo;<code>&lt;key&gt;,&lt;value&gt;\n</code>&rdquo;</p>
+
+<p>Bila kita gabung seluruh proses ini menjadi satu kesatuan, fungsi pengurai akan terlihat seperti berikut</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></td><td class="code"><pre><span class="kd">func</span> <span class="nf">parse</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">NSString</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*=</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*;"</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">CaseInsensitive</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">matches</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="nf">matchesInString</span><span class="p">((</span><span class="n">query</span> <span class="k">as</span> <span class="kt">String</span><span class="p">),</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">WithTransparentBounds</span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">NSMakeRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+
+    <span class="k">let</span> <span class="nv">results</span> <span class="o">=</span> <span class="n">matches</span>
+
+        <span class="c1">// transformasi dari NSTextCheckingResult menjadi array String</span>
+        <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">match</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="k">in</span>
+            <span class="k">var</span> <span class="nv">strings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="k">in</span> <span class="mi">0</span><span class="o">..&lt;</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">numberOfRanges</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="nf">rangeAtIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="n">strings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="nf">substringWithRange</span><span class="p">(</span><span class="n">range</span><span class="p">)</span> <span class="k">as</span> <span class="kt">String</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">strings</span>
+        <span class="p">}</span>
+
+        <span class="c1">// periksa apakah pasti ada tiga atau lebih string</span>
+        <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="p">}</span>
+
+        <span class="c1">// transformasi dari array string menjadi key value yang terpisah oleh koma</span>
+        <span class="o">.</span><span class="nf">reduce</span><span class="p">(</span><span class="s">""</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">strings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="k">in</span>
+            <span class="k">return</span> <span class="n">initial</span> <span class="o">+</span> <span class="s">"</span><span class="se">\(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="se">)</span><span class="s">,</span><span class="se">\(</span><span class="n">strings</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="se">)\n</span><span class="s">"</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Hasil akhir</h3>
+
+<p>Kode akhir bisa lihat di <a href="https://github.com/ikhsan/ikhsan.github.io/blob/develop/source/blog/2015-10-17-swift-scripting/xtractr.swift">sini</a>, berikut dengan penanganan error yang lebih lengkap.</p>
+
+<p>Namun saat kita jalankan, skrip ini hanya akan menampikan konten csv di dalam terminal. Untuk menyimpannya ke dalam file, kita harus pass hasil cetak tersebut langsung di terminal dengan format &ldquo;<code>&gt; nama_file.csv</code>&rdquo;.</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift Localizable.strings <span class="c"># hanya mencetak di terminal</span>
+<span class="gp">$ </span>./xtractr.swift Localizable.strings &gt; extracted.csv <span class="c"># mencetak ke dalam sebuah file extracted.csv</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Walau tugas saya saat itu cukup remeh namun tugas ini jadi lebih menarik dan lebih menyenangkan karena saya menantang diri saya dengan menggunakan Swift. Sampai jumpa di skrip-skrip Swift selanjutnya!</p>
+
+<hr>
+
+<h2>Update 10-11-2015</h2>
+
+<p>Kalau perlu contoh lain yang lebih advance, bisa cek <a href="http://swift.ayaka.me/posts/2015/11/5/swift-scripting-generating-acknowledgements-for-cocoapods-and-carthage-dependencies">postingan Ayaka</a> tentang bagaimana dia membuat halaman acknowledgement dengan membaca file Cocoapods and Carthage. Keren cuy!</p>
+
+      <footer>
+  <div class="footer-blog">
+    <p>
+      Saya Ikhsan dan ini adalah blog saya tentang pemikiran seputar koding. Hal-hal selain kodingan saya tulis di blog utama, <a href="http://ikhsan.me">Lifeage</a>. Kontak saya via Twitter <a href="http://twitter.com/ixnixnixn">@ixnixnixn</a> atau langsung saja email di <a href="mailto:ikhsan.assaat@gmail.com">ikhsan.assaat@gmail.com</a>.
+    </p>
+  </div>
+
+  <div class="footer-links">
+  <ul>
+    <li><a href="http://twitter.com/ixnixnixn">Twitter</a></li>
+    <li><a href="http://github.com/ikhsan">Github</a></li>
+    <li><a href="http://ikhsan.me">Lifeage</a></li>
+  </ul>
+
+  <div class="copyright">
+    <p>&copy; Codage 2009–2015</p>
+  </div>
+</div>
+
+
+</footer>
+
+    </div>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-12712252-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

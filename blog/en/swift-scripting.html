@@ -1,0 +1,299 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge;chrome=1' />
+    <title>Codeage - Swift Scripting : Extracting String File</title>
+    <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
+
+    <link href="/stylesheets/all.css" rel="stylesheet" />
+    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" />
+  </head>
+  <body>
+
+
+    <div id="main" role="main">
+      
+
+
+<nav>
+  <h1 class="blog-title"><a href="/">Codeage</a></h1>
+  <p class="blog-description">
+    Pardon my ramblings about code and such
+  </p>
+  <div class="blog-lang">
+    <strong>English</strong> / <a href="/blog/id/swift-scripting.html">Bahasa</a>
+  </div>
+</nav>
+
+      <article>
+        <h1>Swift Scripting : Extracting String File</h1>
+        <p>I was given a tedious task at work that to extract all the strings from <code>&quot;Localizable.strings&quot;</code> in our iOS project to an excel spreadsheet. I was wondering how to make this more interesting and more challenging. So I took this task to be another opportunity to play around with Swift. </p>
+
+<p>I was inspired by <a href="https://realm.io/news/swift-scripting/">Ayaka&rsquo;s talk</a> on Swift Summit that even though you have not yet used Swift for the main project, we could tackel small problems with Swift.</p>
+
+<h3>Making and Running Swift Script</h3>
+
+<ul>
+<li>Make sure Xcode is installed</li>
+<li>Create a swift file (mine is &rsquo;<code>xtractr.swift</code>&rsquo;)</li>
+<li>Add <a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</a> notation in the first line of the file to inform that we will compile the file with Swift REPL</li>
+</ul>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>Use <code>print()</code> to print text on your console</li>
+</ul>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="nf">print</span><span class="p">(</span><span class="s">"This text is created with Swift!"</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>On your terminal, change your file permission to be executable</li>
+</ul>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre>// make sure you are <span class="k">in </span>the same directory as your swift file
+<span class="gp">$ </span>chmod +x xtractr.swift
+</pre></td></tr></tbody></table>
+</div>
+
+<ul>
+<li>Run your script from your terminal</li>
+</ul>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift
+<span class="s2">"This text is created with Swift!"</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Simple right? After we have successfully print a text, lets try build our real parser for <code>Localizable.strings</code></p>
+
+<h3>Reading arguments from terminal</h3>
+
+<p>To receive the filename from terminal, we could use a variable called <code>Process.arguments</code>. This variable has all the arguments
+that is added when the app is called.</p>
+
+<p>Try to change our script so that it prints all the arguments</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+<span class="nf">print</span><span class="p">(</span><span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Now run the script with some arguments</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift <span class="nb">test </span>arguments 123
+<span class="o">[</span><span class="s2">"./xtractr.swift"</span>, <span class="s2">"test"</span>, <span class="s2">"arguments"</span>, <span class="s2">"123"</span><span class="o">]</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>As we can see, each word is included in the list (which also includes the filename itself). We want to create a script that expects only one parameter, which is the path to a strings file. We could tidy this ability to its own function, which could also checks the total of parameters and uses the first one as its path.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></td><td class="code"><pre><span class="cp">#!/usr/bin/env xcrun swift</span>
+
+<span class="kd">func</span> <span class="nf">getParameter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s">"File is not found"</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kt">Process</span><span class="o">.</span><span class="n">arguments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">getParameter</span><span class="p">())</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Before you continue on testing the script, try to find any <code>Localizable.strings</code> that you have and put inside the same directory as the script (I put mine in <code>~/Desktop</code>). Run the script again without an argument, one argument and multiple arguments.</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift     
+File is not found
+<span class="gp">$ </span>./xtractr.swift Localizable.strings
+Localizable.strings
+<span class="gp">$ </span>./xtractr.swift Localizable.strings 123 heyho
+Localizable.strings
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Reading contents from file</h3>
+
+<p>To read the contents of a file, we could use <code>NSString</code>&rsquo;s constructor method that expects a file path.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1</pre></td><td class="code"><pre><span class="k">let</span> <span class="nv">content</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSString</span><span class="p">(</span><span class="nv">contentsOfFile</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span> <span class="nv">encoding</span><span class="p">:</span> <span class="kt">NSUTF8StringEncoding</span><span class="p">)</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>If we look closely, the type that we use is <code>NSString</code> instead of Swift&rsquo;s <code>String</code>. We could convert from one type to another quite easily but we just keep using <code>NSString</code> because we need its behaviors and methods, and just convert the type once needed.</p>
+
+<h3>Parsing the texts of <code>Localizable.strings</code></h3>
+
+<p>Our parser will use <code>NSRegularExpression</code> which will find all the strings from the file that match the pattern : <code>&quot;&lt;key&gt;&quot; = &quot;&lt;value&gt;&quot;;</code>.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*=</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*;"</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">CaseInsensitive</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">matches</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="nf">matchesInString</span><span class="p">((</span><span class="n">query</span> <span class="k">as</span> <span class="kt">String</span><span class="p">),</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">WithTransparentBounds</span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">NSMakeRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Variable <code>matches</code> is an array of <code>NSTextCheckingResult</code>. <code>NSTextCheckingResult</code> has a list of <code>NSRange</code> that refers to locations of all the string that match the pattern that is given. To get all the string from an instance of <code>NSTextCheckingResult</code>, we can access it via its <code>rangeAtIndex</code> method.</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6</pre></td><td class="code"><pre><span class="k">var</span> <span class="nv">strings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+<span class="k">for</span> <span class="n">index</span> <span class="k">in</span> <span class="mi">0</span><span class="o">..&lt;</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">numberOfRanges</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="nf">rangeAtIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">strings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="nf">substringWithRange</span><span class="p">(</span><span class="n">range</span><span class="p">)</span> <span class="k">as</span> <span class="kt">String</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">return</span> <span class="n">strings</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Apparently, every array of strings that we receive has a total of three; a format of the whole pattern (<code>&quot;&lt;key&gt;&quot; = &quot;&lt;value&gt;&quot;;</code>), its key (<code>&lt;key&gt;</code>) and last its value (<code>&lt;value&gt;</code>). For our purpose, we only need the last two which is the key and value pair.</p>
+
+<p>Lastly, we convert every key-value pair to a format that is readable by Excel. The easiest format is comma-separated values or known as CSV file. The file should simply separate each column with a comma, so for us we need to format our pair to be; &ldquo;<code>&lt;key&gt;,&lt;value&gt;\n</code>&rdquo;</p>
+
+<p>If we combine all the parsing processes into one, its function would looked like below</p>
+<div class="highlight swift"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></td><td class="code"><pre><span class="kd">func</span> <span class="nf">parse</span><span class="p">(</span><span class="nv">query</span><span class="p">:</span> <span class="kt">NSString</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">regex</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">NSRegularExpression</span><span class="p">(</span><span class="nv">pattern</span><span class="p">:</span> <span class="s">"</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*=</span><span class="se">\\</span><span class="s">s*</span><span class="se">\"</span><span class="s">(.+?)</span><span class="se">\"\\</span><span class="s">s*;"</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">CaseInsensitive</span><span class="p">)</span>
+    <span class="k">let</span> <span class="nv">matches</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="nf">matchesInString</span><span class="p">((</span><span class="n">query</span> <span class="k">as</span> <span class="kt">String</span><span class="p">),</span> <span class="nv">options</span><span class="p">:</span> <span class="o">.</span><span class="kt">WithTransparentBounds</span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">NSMakeRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
+
+    <span class="k">let</span> <span class="nv">results</span> <span class="o">=</span> <span class="n">matches</span>
+
+        <span class="c1">// transforms NSTextCheckingResult to an array of Strings</span>
+        <span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="n">match</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="k">in</span>
+            <span class="k">var</span> <span class="nv">strings</span> <span class="o">=</span> <span class="p">[</span><span class="kt">String</span><span class="p">]()</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="k">in</span> <span class="mi">0</span><span class="o">..&lt;</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">numberOfRanges</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="nf">rangeAtIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="n">strings</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="nf">substringWithRange</span><span class="p">(</span><span class="n">range</span><span class="p">)</span> <span class="k">as</span> <span class="kt">String</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="n">strings</span>
+        <span class="p">}</span>
+
+        <span class="c1">// checks if the Strings is more than three</span>
+        <span class="o">.</span><span class="n">filter</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="p">}</span>
+
+        <span class="c1">// transforms an array of string into a comma-separated key value pairs</span>
+        <span class="o">.</span><span class="nf">reduce</span><span class="p">(</span><span class="s">""</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">strings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="k">in</span>
+            <span class="k">return</span> <span class="n">initial</span> <span class="o">+</span> <span class="s">"</span><span class="se">\(</span><span class="n">strings</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="se">)</span><span class="s">,</span><span class="se">\(</span><span class="n">strings</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="se">)\n</span><span class="s">"</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+<span class="p">}</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<h3>Result</h3>
+
+<p>The final code can be reviewed <a href="https://github.com/ikhsan/ikhsan.github.io/blob/develop/source/blog/2015-10-17-swift-scripting/xtractr.swift">here</a>. Also, I have added error handling using custom <code>ErrorType</code>s and <code>guard</code>s.</p>
+
+<p>Although, this script only prints the csv contents in the terminal instead of making a new file. To put all the csv content to a file, we need to pass it in terminal using this format &ldquo;<code>&gt; &lt;file_name&gt;.csv</code>&rdquo;.</p>
+<div class="highlight shell"><table style="border-spacing: 0"><tbody><tr><td class="gutter gl" style="text-align: right"><pre class="lineno">1
+2</pre></td><td class="code"><pre><span class="gp">$ </span>./xtractr.swift Localizable.strings <span class="c"># only prints in terminal</span>
+<span class="gp">$ </span>./xtractr.swift Localizable.strings &gt; extracted.csv <span class="c"># create a new file 'extracted.csv' and put all the contents inside</span>
+</pre></td></tr></tbody></table>
+</div>
+
+<p>Even though this task is simple, but we made it so that it is more interesting and fun! I challenged myself to use Swift and I really enjoyed it. See you in another Swift scripting posts!</p>
+
+<hr>
+
+<h2>Update 10-11-2015</h2>
+
+<p>If you need a more advanced inspiration on Swift scripting, take a look <a href="http://swift.ayaka.me/posts/2015/11/5/swift-scripting-generating-acknowledgements-for-cocoapods-and-carthage-dependencies">Ayaka&rsquo;s post</a> on making acknowledgement page by reading its Cocoapods and Carthage dependencies. Really neat!</p>
+
+        <div class="metadata">
+          <div class="date">Oct.17 2015</div>
+          <div class="tag-list">
+    <a class="tag" href="/blog/tags/swift.html">swift</a>
+    <a class="tag" href="/blog/tags/scripting.html">scripting</a>
+</div>
+
+        </div>
+      </article>
+
+      
+<div class="article-links">
+  <div class="previous-link">
+    <a href="/blog/en/future-of-ramadhan.html">&larr; Data Visualisation with Swift : The Future of Ramadhan</a>
+  </div>
+
+  <div class="next-link">
+    <a href="/blog/en/fp101x-swift.html">[FP101x] Credit card validation with Swift (Lab2) &rarr;</a>
+  </div>
+
+</div>
+
+      <footer>
+  <div class="footer-blog">
+    <p>
+      I'm Ikhsan and this is my blog for my thoughts on codes and the likes. All other stuff are on my main blog, <a href="http://ikhsan.me">Lifeage</a>. Get in touch via Twitter <a href="http://twitter.com/ixnixnixn">@ixnixnixn</a> or email <a href="mailto:ikhsan.assaat@gmail.com">ikhsan.assaat@gmail.com</a>.
+    </p>
+  </div>
+
+  <div class="footer-links">
+  <ul>
+    <li><a href="http://twitter.com/ixnixnixn">Twitter</a></li>
+    <li><a href="http://github.com/ikhsan">Github</a></li>
+    <li><a href="http://ikhsan.me">Lifeage</a></li>
+  </ul>
+
+  <div class="copyright">
+    <p>&copy; Codage 2009–2015</p>
+  </div>
+</div>
+
+
+</footer>
+
+    </div>
+
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-12712252-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+  </body>
+</html>

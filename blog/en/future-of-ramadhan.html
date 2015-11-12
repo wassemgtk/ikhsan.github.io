@@ -6,8 +6,8 @@
     <title>Codeage - Data Visualisation with Swift : The Future of Ramadhan</title>
     <link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/blog/feed.xml" />
 
-    <link href="/stylesheets/all.css" rel="stylesheet" type="text/css" />
-    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/all.css" rel="stylesheet" />
+    <link href="/stylesheets/syntax-highlights.css" rel="stylesheet" />
   </head>
   <body>
 
@@ -56,7 +56,7 @@
 17
 18</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">NSDate</span> <span class="p">{</span>
     <span class="kd">static</span> <span class="kd">func</span> <span class="nf">rmdn_ramadhanDaysForHijriYear</span><span class="p">(</span><span class="nv">year</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">NSDate</span><span class="p">]</span> <span class="p">{</span>
-        <span class="n">guard</span> <span class="k">let</span> <span class="nv">hijriCalendar</span> <span class="o">=</span> <span class="kt">NSCalendar</span><span class="p">(</span><span class="nv">calendarIdentifier</span><span class="p">:</span> <span class="kt">NSCalendarIdentifierIslamic</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">guard</span> <span class="k">let</span> <span class="nv">hijriCalendar</span> <span class="o">=</span> <span class="kt">NSCalendar</span><span class="p">(</span><span class="nv">calendarIdentifier</span><span class="p">:</span> <span class="kt">NSCalendarIdentifierIslamic</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
           <span class="k">return</span> <span class="p">[]</span>
         <span class="p">}</span>
 
@@ -85,7 +85,7 @@
 5
 6
 7</pre></td><td class="code"><pre><span class="kt">CLGeocoder</span><span class="p">()</span><span class="o">.</span><span class="nf">geocodeAddressString</span><span class="p">(</span><span class="s">"London"</span><span class="p">)</span> <span class="p">{</span> <span class="n">p</span><span class="p">,</span> <span class="n">error</span> <span class="k">in</span>
-    <span class="n">guard</span> <span class="k">let</span> <span class="nv">placemark</span> <span class="o">=</span> <span class="n">p</span><span class="p">?</span><span class="o">.</span><span class="n">first</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">guard</span> <span class="k">let</span> <span class="nv">placemark</span> <span class="o">=</span> <span class="n">p</span><span class="p">?</span><span class="o">.</span><span class="n">first</span> <span class="k">else</span> <span class="p">{</span>
         <span class="k">return</span>
     <span class="p">}</span>
 
@@ -115,7 +115,7 @@
 14
 15
 16</pre></td><td class="code"><pre><span class="kd">func</span> <span class="nf">prayerTimesForDate</span><span class="p">(</span><span class="nv">date</span><span class="p">:</span> <span class="kt">NSDate</span><span class="p">,</span> <span class="nv">placemark</span><span class="p">:</span> <span class="kt">CLPlacemark</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">BAPrayerTimes</span><span class="p">?</span> <span class="p">{</span>
-    <span class="n">guard</span> <span class="k">let</span> <span class="nv">latitude</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">location</span><span class="p">?</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+    <span class="k">guard</span> <span class="k">let</span> <span class="nv">latitude</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">location</span><span class="p">?</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
         <span class="k">let</span> <span class="nv">longitude</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">location</span><span class="p">?</span><span class="o">.</span><span class="n">coordinate</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
         <span class="k">let</span> <span class="nv">timeZone</span> <span class="o">=</span> <span class="n">placemark</span><span class="o">.</span><span class="n">timeZone</span> <span class="k">else</span> <span class="p">{</span>
             <span class="k">return</span> <span class="kc">nil</span>
@@ -262,7 +262,7 @@ blue     113 |------------{??}--------| 18
 11
 12</pre></td><td class="code"><pre><span class="kd">extension</span> <span class="kt">UIImage</span> <span class="p">{</span>
     <span class="kd">func</span> <span class="nf">rmdn_saveImageWithName</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="p">{</span>
-        <span class="n">guard</span> <span class="k">let</span> <span class="nv">documentPath</span> <span class="o">=</span> <span class="kt">NSSearchPathForDirectoriesInDomains</span><span class="p">(</span><span class="kt">NSSearchPathDirectory</span><span class="o">.</span><span class="kt">DocumentDirectory</span><span class="p">,</span> <span class="kt">NSSearchPathDomainMask</span><span class="o">.</span><span class="kt">UserDomainMask</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">,</span>
+        <span class="k">guard</span> <span class="k">let</span> <span class="nv">documentPath</span> <span class="o">=</span> <span class="kt">NSSearchPathForDirectoriesInDomains</span><span class="p">(</span><span class="kt">NSSearchPathDirectory</span><span class="o">.</span><span class="kt">DocumentDirectory</span><span class="p">,</span> <span class="kt">NSSearchPathDomainMask</span><span class="o">.</span><span class="kt">UserDomainMask</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">,</span>
             <span class="k">let</span> <span class="nv">image</span> <span class="o">=</span> <span class="kt">UIImagePNGRepresentation</span><span class="p">(</span><span class="k">self</span><span class="p">)</span> <span class="k">else</span> <span class="p">{</span>
                 <span class="k">return</span> <span class="s">""</span>
         <span class="p">}</span>
@@ -311,7 +311,7 @@ blue     113 |------------{??}--------| 18
   </div>
 
   <div class="next-link">
-    &nbsp;
+    <a href="/blog/en/swift-scripting.html">Swift Scripting : Extracting String File &rarr;</a>
   </div>
 
 </div>
