@@ -136,3 +136,13 @@ func evalRev(digits: [Int]) -> Int {
     }
     return result
 }
+
+extension SequenceType {
+    public func all(@noescape validateElement: (Self.Generator.Element) -> Bool) -> Bool {
+        return self.reduce(true) { initial, element in
+            return initial && validateElement(element)
+        }
+    }
+}
+
+

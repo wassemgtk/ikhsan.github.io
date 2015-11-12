@@ -1,6 +1,6 @@
 /*:
 # Swift - Validating Credit Card Numbers
-### [Lab 2, FP101x Introduction to Functional Programming @ edX](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0)
+### Lab 2, [FP101x Introduction to Functional Programming @ edX](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0)
 Have you ever wondered how websites validate your credit card number when you shop online? They don’t check a massive database of numbers, and they don’t use magic. In fact, most credit providers rely on a checksum formula for distinguishing valid numbers from random collection of digits (or typing mistakes).
 
 In this lab, you will implement a __validation algorithm for credit cards__. The algorithm follows these steps:
@@ -38,15 +38,17 @@ Define a function
 that takes a `n: Integer` where `n >= 0` and returns a list of the digits of n. More precisely, `toDigits` should satisfy the following properties, for all `n : Integer`  where `n >= 0` :
 
 * eval(toDigits(n)) == n
+* toDigits(n).all { d in d >= 0 && d < 10 }
 * String(n).count == (toDigits(n)).count
 
-Note: `eval` is specified in the `helper.swift` file
+Note: `eval` and `all` are specified in the `helper.swift` file
 */
 
 func toDigits(digit: Int) -> [Int] {
     // TODO: to be implemented
     return []
 }
+
 
 /*:
 __Ex. 1__
@@ -57,9 +59,10 @@ Define a function
 that takes a `n: Integer` where `n >= 0` and returns a list of the digits of n in reverse order. More precisely, `toDigitsRev` should satisfy the following properties, for all `n : Integer`  where `n >= 0`:
 
 * n == evalRev(toDigitsRev(n))
+* toDigits(n).all { d in d >= 0 && d < 10 }
 * String(n).count == (toDigitsRev(n)).count
 
-Note: `evalRev` is specified in the `helper.swift` file
+Note: `evalRev` and `all` are specified in the `helper.swift` file
 */
 
 func toDigitsRev(digit: Int) -> [Int] {
@@ -131,4 +134,3 @@ func numValid(digits: [Int]) -> Int {
         .filter(isValid)
         .count
 }
-

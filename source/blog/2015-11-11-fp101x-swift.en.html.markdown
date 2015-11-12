@@ -4,9 +4,7 @@ date: 2015-11-11 13:28 UTC
 tags: functional programming, swift, haskell
 ---
 
-I am currently taking [TUDelft's "FP101x - Intro to Functional Programming"](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0) class at edX, and I am enjoying it so far.READMORE
-
-The reason why this post exists is to share my FP101x exercises that I did written in Swift. The instructor of the class, [Erik Meijer](https://twitter.com/headinthebox), even said this a while back:
+I am currently taking [TUDelft's "FP101x - Intro to Functional Programming"](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0) class at edX, and I am enjoying it so far. This post is written to share my FP101x exercises that I did with Swift. READMORE The instructor of the class, [Erik Meijer](https://twitter.com/headinthebox), even said this a while back:
 
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">At this point, <a href="https://twitter.com/SwiftLang">@SwiftLang</a> is probably a better, and more valuable, vehicle for learning functional programming than Haskell.</p>&mdash; Erik Meijer (@headinthebox) <a href="https://twitter.com/headinthebox/status/655407294969196544">October 17, 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -34,33 +32,36 @@ func evalRev(digits: [Int]) -> Int {
     return result
 }
 
-// Ex. 0
-func toDigits(digit: Int) -> [Int] {
-    return []
+extension SequenceType {
+    public func all(@noescape validateElement: (Self.Generator.Element) -> Bool) -> Bool {
+        return self.reduce(true) { initial, element in
+            return initial && validateElement(element)
+        }
+    }
 }
+
+// Ex. 0
+func toDigits(digit: Int) -> [Int] { return [] }
 
 // Ex. 1
-func toDigitsRev(digit: Int) -> [Int] {
-    return []
-}
+func toDigitsRev(digit: Int) -> [Int] { return [] }
 
 // Ex. 2
-func doubleSecond(digits: [Int]) -> [Int] {
-    return []
-}
+func doubleSecond(digits: [Int]) -> [Int] { return [] }
 
 // Ex. 3
-func sumDigits(digits: [Int]) -> Int {
-    return 0
-}
+func sumDigits(digits: [Int]) -> Int { return 0 }
 
 // Ex. 4
-func isValid(digit: Int) -> Bool {
-    return false
+func isValid(digit: Int) -> Bool { return false }
+
+// Ex. 5
+func numValid(digits: [Int]) -> Int {
+    return digits.filter(isValid).count
 }
 ```
 
-For the complete version of this exercise, you can download the full playground file : [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). It is properly formatted with markdown and stuff, it is pretty neat!
+For the complete version of this exercise, you can download the full playground file : [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). It is properly formatted with markdown and stuff, it is pretty neat! This is compatible for Xcode 7.1 and Swift 2.0.
 
 ![playground](blog/2015-11-11-fp101x-swift/playground.png "Playground in Xcode")
 
