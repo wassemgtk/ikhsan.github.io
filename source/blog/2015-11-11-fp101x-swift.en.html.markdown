@@ -1,20 +1,20 @@
 ---
-title: "[FP101x] Credit card validation with Swift"
+title: "[FP101x] Credit card validation with Swift (Lab2)"
 date: 2015-11-11 13:28 UTC
 tags: functional programming, swift, haskell
 ---
 
 I am currently taking [TUDelft's "FP101x - Intro to Functional Programming"](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0) class at edX, and I am enjoying it so far.READMORE
 
-The reason why this exists is because I want to share my exercises that I did from the FP101x class using Swift. Even, the instructor of the class, [Erik Meijer](https://twitter.com/headinthebox), said this a while back:
+The reason why this post exists is to share my FP101x exercises that I did written in Swift. The instructor of the class, [Erik Meijer](https://twitter.com/headinthebox), even said this a while back:
 
 <blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">At this point, <a href="https://twitter.com/SwiftLang">@SwiftLang</a> is probably a better, and more valuable, vehicle for learning functional programming than Haskell.</p>&mdash; Erik Meijer (@headinthebox) <a href="https://twitter.com/headinthebox/status/655407294969196544">October 17, 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-Since there is no swift code that has been found in the class, I ported the haskell file into a Swift playground file. With this, everyone is able practice without the need of taking the actual class.
+Since I could not found any swift code found in the FP101x class, I ported the haskell files to Swift playgrounds.
 
-### Lab2.swift
+### 💳 validation - Lab2.swift
 
-This is the port of the lab2.hs exercise;
+Below is the snippet of the lab2.hs exercise written in Swift
 
 ```swift
 
@@ -60,9 +60,9 @@ func isValid(digit: Int) -> Bool {
 }
 ```
 
-For the complete version of this exercise, you can download the full playground file: [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground)
+For the complete version of this exercise, you can download the full playground file: [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). It is properly formatted with markdown and stuff, it is pretty neat!
 
-![playground](blog/2015-11-11-fp101x-swift/playground.png)
+![playground](blog/2015-11-11-fp101x-swift/playground.png "Playground in Xcode")
 
 ### Haskell version
 
@@ -70,4 +70,6 @@ If you are interested to check the original exercise in haskell, you can see it 
 
 ## Solution
 
-I will post my solution once its deadline is passed. So please come back after November 26th to discuss and compare our solutions!
+The plan is to port all the FP101x's exercises from haskell to swift playgrounds and make follow-ups once the deadlines are passed. So please come back after the deadlines to discuss and compare our solutions.
+
+As Erik himself always said in his class, happy hacking! 🤓
