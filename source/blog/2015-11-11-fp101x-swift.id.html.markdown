@@ -4,14 +4,72 @@ date: 2015-11-11 13:28 UTC
 tags: functional programming, swift, haskell
 ---
 
-namun karena sampai saat ini belum ada, saya buat saja sendiri versi playground-nya sehingga bisa digunakan siapapun, sekalipun tidak sedang mengambil kelas fp101.
+Sekarang saya sedang mengambil kelas online [TUDelft's "FP101x - Intro to Functional Programming"](https://www.edx.org/course/introduction-functional-programming-delftx-fp101x-0) di edX, dan ternyata seru juga. READMORE
 
-berikut kutipan dari latihannya, dan ini file lengkapnya tersedia sebagai lab2.playground.
+Saya menulis postingan ini untuk berbagi latihan-latihan dari kelas FP101x yang saya kerjakan menggunakan Swift. Bahkan sang pengajar kelas tersebut, [Erik Meijer](https://twitter.com/headinthebox), beberapa waktu lalu nge-tweet seperti ini :
 
-`kutipan lab2.playground`
+<blockquote class="twitter-tweet" lang="en"><p lang="en" dir="ltr">At this point, <a href="https://twitter.com/SwiftLang">@SwiftLang</a> is probably a better, and more valuable, vehicle for learning functional programming than Haskell.</p>&mdash; Erik Meijer (@headinthebox) <a href="https://twitter.com/headinthebox/status/655407294969196544">October 17, 2015</a></blockquote> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-kalau mau lihat file aslinya dari haskell, bisa lihat di lab2.hs.
+Tapi karena sampai sekarang saya belum menemukan kode Swift di kelas FP101x, jadi saya tulis ulang kode haskell dari kelas FP101x ke Swift playground.
 
-`kutipan lab2.hs`
+### Validasi 💳 - Lab2.swift
 
-Tentu saja saya akan mempost solusinya setelah deadline-nya lewat. Silahkan cek kembali halaman ini untuk mendiskusikan solusi latihan ini.
+Berikut kutipan dari latihan lab2.hs yang saya tulis kembali dengan Swift
+
+```swift
+
+// Helpers
+func eval(digits: [Int]) -> Int {
+    return digits.reduce(0, combine: { initValue, digit in
+        digit + (initValue * 10)
+    })
+}
+
+func evalRev(digits: [Int]) -> Int {
+    // menggunakan reversed iterator karena tidak ada foldr di swift
+    var result = 0
+    for index in (digits.count-1).stride(through: 0, by: -1) {
+        result = (result * 10) + digits[index]
+    }
+    return result
+}
+
+// Ex. 0
+func toDigits(digit: Int) -> [Int] {
+    return []
+}
+
+// Ex. 1
+func toDigitsRev(digit: Int) -> [Int] {
+    return []
+}
+
+// Ex. 2
+func doubleSecond(digits: [Int]) -> [Int] {
+    return []
+}
+
+// Ex. 3
+func sumDigits(digits: [Int]) -> Int {
+    return 0
+}
+
+// Ex. 4
+func isValid(digit: Int) -> Bool {
+    return false
+}
+```
+
+Versi lengkapnya latihan ini bisa diunduh sebagai playground : [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). Playground-nya sudah diformat sedemikian rupa dengan markdown, jadi lebih rapi aja gitu.
+
+![playground](blog/2015-11-11-fp101x-swift/playground.png "Playground in Xcode")
+
+### Versi haskell
+
+Kalau tertarik untuk mengecek latihan aslinya dalam haskell, bisa dilihat di [sini](2015-11-11-fp101x-swift/lab2.hs).
+
+## Solusi
+
+Rencananya adalah menulis ulang semua latihan dari FP101x menjadi Swift playground dan setiap melewati _deadline_ akan saya posting solusinya. Jadi nanti balik lagi ya setelah _deadline_-nya lewat untuk berdiskusi dan membandingkan solusi-solusi yang kita temui.
+
+Seperti yang selalu dikatakan Erik di kelasnya, happy hacking! 🤓

@@ -60,7 +60,7 @@ func isValid(digit: Int) -> Bool {
 }
 ```
 
-For the complete version of this exercise, you can download the full playground file: [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). It is properly formatted with markdown and stuff, it is pretty neat!
+For the complete version of this exercise, you can download the full playground file : [Lab2.playground](2015-11-11-fp101x-swift/lab2.playground.zip). It is properly formatted with markdown and stuff, it is pretty neat!
 
 ![playground](blog/2015-11-11-fp101x-swift/playground.png "Playground in Xcode")
 
