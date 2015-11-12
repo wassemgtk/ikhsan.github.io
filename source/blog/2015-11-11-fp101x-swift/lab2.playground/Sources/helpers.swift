@@ -1,6 +1,6 @@
 // MARK: Helpers
 
-let creditcards = [
+let creditCards = [
     4716347184862961,
     4532899082537349,
     4485429517622493,
@@ -122,13 +122,6 @@ let creditcards = [
     377851536227201,
     345763240913232
 ]
-
-
-extension CollectionType where Generator.Element == Int {
-    public func sum() -> Int {
-        return self.reduce(0, combine: (+))
-    }
-}
 
 func eval(digits: [Int]) -> Int {
     return digits.reduce(0, combine: { initValue, digit in
