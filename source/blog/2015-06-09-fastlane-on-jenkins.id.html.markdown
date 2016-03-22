@@ -27,7 +27,7 @@ File konfigurasi (yang bernama `Fastfile`) hanya berupa file teks biasa, jadi ki
 
 ### Integrasi dengan Jenkins (yang Seharusnya Mudah)
 
-[Ash Furrow](https://twitter.com/ashfurrow) menulis [panduan singkat](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md) dalam mengintegrasikan Fastlane ke dalam Jenkins. Kalau Jenkins dan Fastlane sudah terinstall, kita tinggal membuat job baru yang punya dua pekerjaan, mengambil kode sumber dari repositori (dengan plugin git atau SVN) dan mengeksekusi skrip perintah Fastlane (`fastlane <nama jalur>`).
+Fastlane mempunyai [panduan singkat](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md) untuk pengintegrasiannya dengan Jenkins. Kalau Jenkins dan Fastlane sudah terinstall, kita tinggal membuat job baru yang punya dua pekerjaan, mengambil kode sumber dari repositori (dengan plugin git atau SVN) dan mengeksekusi skrip perintah Fastlane (`fastlane <nama jalur>`).
 
 ## Problem with Jenkins
 

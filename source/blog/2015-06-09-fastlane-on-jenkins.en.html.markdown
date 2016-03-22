@@ -26,7 +26,7 @@ The config files (known as `Fastfile`) are just plain texts, so we could just ea
 
 ### Jenkins integration is (or should be) Easy
 
-[Ash Furrow](https://twitter.com/ashfurrow) wrote a [short and sweet guideline](https://github.com/KrauseFx/fastlane/blob/master/docs/Jenkins.md) on integrating Fastlane to Jenkins. Once Jenkins and Fastlane is installed in your CI machine, you need to create a job that has two things: fetching the repository (using git or SVN plugin) and execute the Fastlane's script (`fastlane <your lane>`).
+Fastlane has a [short and sweet guideline](https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Jenkins.md) on Jenkins integration. Once Jenkins and Fastlane is installed in your CI machine, you need to create a job that has two things: fetching the repository (using git or SVN plugin) and execute the Fastlane's script (`fastlane <your lane>`).
 
 ## Problem with Jenkins
 
